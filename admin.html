@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>INVIS X | Admin Panel</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #050505; color: #fff; min-height: 100vh; }
+    
+    .container { max-width: 1000px; margin: 0 auto; padding: 30px 20px; }
+    
+    /* Header */
+    .header { text-align: center; margin-bottom: 30px; padding: 30px; background: linear-gradient(135deg, rgba(239,68,68,0.1), rgba(249,115,22,0.05)); border-radius: 20px; border: 1px solid rgba(239,68,68,0.2); }
+    .logo { font-family: 'Poppins', sans-serif; font-size: 2.2rem; font-weight: 800; background: linear-gradient(135deg, #ef4444, #f97316); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .subtitle { color: #666; font-size: 0.9rem; margin-top: 8px; }
+    .user-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(239,68,68,0.1); color: #ef4444; padding: 8px 16px; border-radius: 50px; font-size: 0.8rem; font-weight: 600; margin-top: 12px; border: 1px solid rgba(239,68,68,0.2); }
+    .status-bar { display: flex; justify-content: center; gap: 16px; margin-top: 12px; font-size: 0.75rem; color: #555; }
+    .status-item { display: flex; align-items: center; gap: 6px; }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .status-dot.online { background: #22c55e; box-shadow: 0 0 8px rgba(34,197,94,0.5); }
+    .status-dot.offline { background: #ef4444; }
+    
+    /* Cards */
+    .card { background: #0a0a0a; border: 1px solid #1a1a1a; border-radius: 16px; padding: 24px; margin-bottom: 20px; }
+    .card-title { font-family: 'Poppins', sans-serif; font-size: 1.1rem; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+    
+    /* Forms */
+    .form-group { margin-bottom: 16px; }
+    .form-label { display: block; font-size: 0.7rem; color: #666; font-weight: 600; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .form-input, .form-select { width: 100%; padding: 14px 16px; border-radius: 12px; border: 1px solid #222; background: #111; color: #fff; font-size: 0.9rem; outline: none; transition: all 0.2s; }
+    .form-input:focus, .form-select:focus { border-color: #ef4444; box-shadow: 0 0 0 3px rgba(239,68,68,0.1); }
+    .form-input::placeholder { color: #444; }
+    .form-select { cursor: pointer; }
+    .form-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    .form-row-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+    
+    /* Buttons */
+    .btn { padding: 14px 24px; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; border: none; font-size: 0.9rem; }
+    .btn-primary { background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(239,68,68,0.3); }
+    .btn-success { background: linear-gradient(135deg, #22c55e, #16a34a); color: #fff; }
+    .btn-success:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(34,197,94,0.3); }
+    .btn-danger { background: rgba(239,68,68,0.1); color: #ef4444; border: 1px solid rgba(239,68,68,0.2); }
+    .btn-danger:hover { background: rgba(239,68,68,0.2); }
+    .btn-secondary { background: #1a1a1a; color: #888; border: 1px solid #222; }
+    .btn-secondary:hover { background: #222; color: #fff; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
+    .btn-sm { padding: 8px 14px; font-size: 0.8rem; }
+    .btn-full { width: 100%; }
+    
+    /* Tabs */
+    .tabs { display: flex; gap: 8px; margin-bottom: 24px; background: #0a0a0a; padding: 6px; border-radius: 14px; border: 1px solid #1a1a1a; }
+    .tab { flex: 1; padding: 14px; text-align: center; border-radius: 10px; background: transparent; color: #555; border: none; cursor: pointer; font-weight: 600; transition: all 0.2s; }
+    .tab:hover { color: #888; background: #111; }
+    .tab.active { background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; }
+    
+    /* Table */
+    .table-wrap { overflow-x: auto; border-radius: 12px; border: 1px solid #1a1a1a; }
+    .table { width: 100%; border-collapse: collapse; }
+    .table th, .table td { padding: 14px 16px; text-align: left; }
+    .table th { background: #0f0f0f; color: #666; font-size: 0.7rem; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; }
+    .table td { border-top: 1px solid #1a1a1a; }
+    .table tr:hover td { background: #0f0f0f; }
+    
+    /* Badges */
+    .badge { display: inline-block; font-size: 0.65rem; padding: 4px 10px; border-radius: 6px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; }
+    .badge-admin { background: rgba(239,68,68,0.1); color: #ef4444; }
+    .badge-tester { background: rgba(59,130,246,0.1); color: #3b82f6; }
+    
+    /* Login */
+    .login-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .login-box { width: 100%; max-width: 400px; }
+    .login-header { text-align: center; margin-bottom: 30px; }
+    .login-icon { font-size: 3rem; margin-bottom: 16px; }
+    
+    /* Player Items */
+    .player-item { display: flex; align-items: center; gap: 14px; padding: 14px; background: #111; border-radius: 12px; margin-bottom: 8px; border: 1px solid #1a1a1a; transition: all 0.2s; }
+    .player-item:hover { border-color: #333; }
+    .player-item img { width: 40px; height: 40px; border-radius: 10px; border: 2px solid #222; }
+    .player-item-info { flex: 1; }
+    .player-item-name { font-weight: 600; }
+    .player-item-meta { font-size: 0.8rem; color: #555; margin-top: 2px; }
+    .tier-badge { font-size: 0.7rem; padding: 4px 10px; border-radius: 6px; font-weight: 700; }
+    [data-tier*="1"] { color: #ef4444; background: rgba(239,68,68,0.1); }
+    [data-tier*="2"] { color: #f97316; background: rgba(249,115,22,0.1); }
+    [data-tier*="3"] { color: #eab308; background: rgba(234,179,8,0.1); }
+    [data-tier*="4"] { color: #22c55e; background: rgba(34,197,94,0.1); }
+    [data-tier*="5"] { color: #3b82f6; background: rgba(59,130,246,0.1); }
+    
+    /* Toast */
+    .toast { position: fixed; bottom: 24px; right: 24px; padding: 16px 24px; border-radius: 14px; font-weight: 600; transform: translateY(100px); opacity: 0; transition: all 0.3s; z-index: 1000; }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast.success { background: linear-gradient(135deg, #22c55e, #16a34a); }
+    .toast.error { background: linear-gradient(135deg, #ef4444, #dc2626); }
+    
+    /* Footer */
+    .footer { text-align: center; padding: 30px; border-top: 1px solid #1a1a1a; margin-top: 30px; }
+    .footer-links { display: flex; justify-content: center; gap: 16px; margin-bottom: 12px; flex-wrap: wrap; }
+    .footer-links a { color: #ef4444; text-decoration: none; font-size: 0.9rem; }
+    .footer-links a:hover { text-decoration: underline; }
+    
+    .hidden { display: none !important; }
+    
+    @media (max-width: 768px) {
+      .form-row, .form-row-4 { grid-template-columns: 1fr; }
+      .tabs { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- LOGIN -->
+  <div id="loginScreen" class="login-wrap">
+    <div class="login-box">
+      <div class="card">
+        <div class="login-header">
+          <div class="login-icon">🔐</div>
+          <div class="logo">Admin Panel</div>
+          <div class="subtitle">Sign in with admin credentials</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Username</label>
+          <input type="text" id="loginUser" class="form-input" placeholder="Enter username">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input type="password" id="loginPass" class="form-input" placeholder="Enter password">
+        </div>
+        <button id="loginBtn" class="btn btn-primary btn-full">Sign In</button>
+        <div id="loginError" class="hidden" style="color:#ef4444; text-align:center; margin-top:16px; font-size:0.85rem;"></div>
+        <div style="text-align:center; margin-top:20px;">
+          <a href="index.html" style="color:#666; font-size:0.85rem; text-decoration:none;">← Back to Rankings</a>
+        </div>
+      </div>
+      <div style="text-align:center; margin-top:16px; color:#333; font-size:0.8rem;">
+        Default: admin / admin123
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMIN PANEL -->
+  <div id="adminPanel" class="container hidden">
+    <div class="header">
+      <div class="logo">⚙️ Admin Panel</div>
+      <div class="subtitle">Manage accounts and players</div>
+      <div class="user-badge">👑 <span id="currentUser">Admin</span></div>
+      <div class="status-bar">
+        <div class="status-item"><div class="status-dot" id="dbStatus"></div><span id="dbStatusText">Connecting</span></div>
+        <div class="status-item">👥 <span id="statAccounts">0</span> accounts</div>
+        <div class="status-item">🎮 <span id="statPlayers">0</span> players</div>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" data-tab="accounts">👥 Accounts</button>
+      <button class="tab" data-tab="players">🎮 Players</button>
+    </div>
+
+    <!-- ACCOUNTS TAB -->
+    <div id="accountsTab">
+      <div class="card">
+        <div class="card-title">➕ Create Account</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Username</label>
+            <input type="text" id="newUser" class="form-input" placeholder="username">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <input type="password" id="newPass" class="form-input" placeholder="min 6 chars">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Display Name</label>
+            <input type="text" id="newName" class="form-input" placeholder="Display Name">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Role</label>
+            <select id="newRole" class="form-select">
+              <option value="false">🎮 Tester</option>
+              <option value="true">👑 Admin</option>
+            </select>
+          </div>
+        </div>
+        <button id="createBtn" class="btn btn-success btn-full">Create Account</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title">📋 All Accounts</div>
+        <div class="table-wrap">
+          <table class="table">
+            <thead><tr><th>Username</th><th>Name</th><th>Role</th><th>Actions</th></tr></thead>
+            <tbody id="accountsList"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- PLAYERS TAB -->
+    <div id="playersTab" class="hidden">
+      <div class="card">
+        <div class="card-title">➕ Add Player</div>
+        <div class="form-group">
+          <label class="form-label">Player Name (Minecraft)</label>
+          <input type="text" id="playerName" class="form-input" placeholder="e.g. Technoblade">
+        </div>
+        <div class="form-row-4">
+          <div class="form-group">
+            <label class="form-label">Category</label>
+            <select id="playerCat" class="form-select">
+              <option value="sword">⚔️ Sword</option>
+              <option value="axe">🪓 Axe</option>
+              <option value="crystal">💎 Crystal</option>
+              <option value="nethpot">🧪 Nethpot</option>
+              <option value="uhc">❤️ UHC</option>
+              <option value="smp">🏠 SMP</option>
+              <option value="mace">🔨 Mace</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tier</label>
+            <select id="playerTier" class="form-select">
+              <option value="HT1">HT1</option><option value="LT1">LT1</option>
+              <option value="HT2">HT2</option><option value="LT2">LT2</option>
+              <option value="HT3">HT3</option><option value="LT3">LT3</option>
+              <option value="HT4">HT4</option><option value="LT4">LT4</option>
+              <option value="HT5">HT5</option><option value="LT5">LT5</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Region</label>
+            <select id="playerRegion" class="form-select">
+              <option value="NA">🇺🇸 NA</option>
+              <option value="EU">🇪🇺 EU</option>
+              <option value="ASIA">🌏 ASIA</option>
+              <option value="OCE">🇦🇺 OCE</option>
+              <option value="SA">🇧🇷 SA</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tester?</label>
+            <select id="playerTester" class="form-select">
+              <option value="false">No</option>
+              <option value="true">Yes ⭐</option>
+            </select>
+          </div>
+        </div>
+        <button id="addPlayerBtn" class="btn btn-success btn-full">Add Player</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title">🔍 Search & Delete</div>
+        <input type="text" id="searchPlayer" class="form-input" placeholder="Search player...">
+        <div id="playerResults" style="margin-top:16px;"></div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="footer-links">
+        <a href="index.html">📊 Rankings</a>
+        <a href="tester.html">🎮 Tester Panel</a>
+        <button id="logoutBtn" class="btn btn-secondary btn-sm">Sign Out</button>
+      </div>
+      <div style="color:#333; font-size:0.75rem;">INVIS X Admin v2.0</div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script type="module">
+    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+    const SUPABASE_URL = 'https://sqvnsyvcxcsckfrruezq.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxdm5zeXZjeGNzY2tmcnJ1ZXpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5Njc1MTIsImV4cCI6MjA4OTU0MzUxMn0.8PZYAwk3A--v0re9rjdaR8buggFGM6EjEjTvCMBuJew';
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let currentUser = null;
+    let accounts = [];
+    let players = [];
+
+    const $ = id => document.getElementById(id);
+    const $$ = sel => document.querySelectorAll(sel);
+    
+    const toast = (msg, type = 'success') => {
+      const t = $('toast');
+      t.textContent = msg;
+      t.className = `toast ${type} show`;
+      setTimeout(() => t.classList.remove('show'), 3000);
+    };
+
+    const getSkin = name => `https://mc-heads.net/avatar/${name || 'Steve'}/40`;
+    const debounce = (fn, ms) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; };
+    
+    const updateStatus = online => {
+      $('dbStatus').className = `status-dot ${online ? 'online' : 'offline'}`;
+      $('dbStatusText').textContent = online ? 'Connected' : 'Offline';
+    };
+
+    // Load data
+    async function loadAccounts() {
+      const { data, error } = await supabase.from('testers').select('*').order('created_at', { ascending: false });
+      if (!error) { accounts = data || []; updateStatus(true); }
+      else updateStatus(false);
+      $('statAccounts').textContent = accounts.length;
+      renderAccounts();
+    }
+
+    async function loadPlayers() {
+      const { data } = await supabase.from('players').select('*').order('name');
+      players = data || [];
+      $('statPlayers').textContent = players.length;
+    }
+
+    function renderAccounts() {
+      $('accountsList').innerHTML = accounts.length ? accounts.map(a => `
+        <tr>
+          <td><strong>${a.username}</strong></td>
+          <td>${a.display_name}</td>
+          <td><span class="badge ${a.is_admin ? 'badge-admin' : 'badge-tester'}">${a.is_admin ? '👑 Admin' : '🎮 Tester'}</span></td>
+          <td>${a.username === currentUser?.username ? '<span style="color:#444">Current</span>' : `<button class="btn btn-danger btn-sm" onclick="delAccount('${a.id}','${a.username}')">Delete</button>`}</td>
+        </tr>
+      `).join('') : '<tr><td colspan="4" style="text-align:center;color:#444;">No accounts</td></tr>';
+    }
+
+    function renderPlayers(term) {
+      const r = $('playerResults');
+      if (!term) { r.innerHTML = '<div style="color:#444;text-align:center;padding:20px;">Type to search...</div>'; return; }
+      const filtered = players.filter(p => p.name.toLowerCase().includes(term.toLowerCase()));
+      r.innerHTML = filtered.length ? filtered.slice(0, 15).map(p => `
+        <div class="player-item">
+          <img src="${getSkin(p.name)}" onerror="this.src='https://mc-heads.net/avatar/Steve/40'">
+          <div class="player-item-info">
+            <div class="player-item-name">${p.name}</div>
+            <div class="player-item-meta">${p.category} • ${p.region}</div>
+          </div>
+          <span class="tier-badge" data-tier="${p.tier}">${p.tier}</span>
+          <button class="btn btn-danger btn-sm" onclick="delPlayer('${p.id}','${p.name}')">Delete</button>
+        </div>
+      `).join('') : '<div style="color:#444;text-align:center;padding:20px;">No results</div>';
+    }
+
+    // Actions
+    window.delAccount = async (id, name) => {
+      if (!confirm(`Delete ${name}?`)) return;
+      await supabase.from('testers').delete().eq('id', id);
+      toast(`${name} deleted`);
+      loadAccounts();
+    };
+
+    window.delPlayer = async (id, name) => {
+      if (!confirm(`Delete ${name}?`)) return;
+      await supabase.from('players').delete().eq('id', id);
+      toast(`${name} deleted`);
+      loadPlayers();
+      $('searchPlayer').dispatchEvent(new Event('input'));
+    };
+
+    // Auth
+    async function login(user, pass) {
+      const { data, error } = await supabase.from('testers').select('*').eq('username', user).eq('password', pass).eq('is_admin', true).single();
+      if (error || !data) throw new Error('Invalid credentials');
+      return data;
+    }
+
+    function showPanel() {
+      $('loginScreen').classList.add('hidden');
+      $('adminPanel').classList.remove('hidden');
+      $('currentUser').textContent = currentUser.display_name;
+      loadAccounts();
+      loadPlayers();
+    }
+
+    // Init
+    function init() {
+      // Check session
+      const saved = localStorage.getItem('adminUser');
+      if (saved) {
+        currentUser = JSON.parse(saved);
+        showPanel();
+      }
+
+      // Login
+      $('loginBtn').onclick = async () => {
+        const user = $('loginUser').value.trim();
+        const pass = $('loginPass').value;
+        if (!user || !pass) { $('loginError').textContent = 'Enter credentials'; $('loginError').classList.remove('hidden'); return; }
+        
+        $('loginBtn').disabled = true;
+        $('loginBtn').textContent = 'Signing in...';
+        $('loginError').classList.add('hidden');
+        
+        try {
+          currentUser = await login(user, pass);
+          localStorage.setItem('adminUser', JSON.stringify(currentUser));
+          showPanel();
+          toast(`Welcome, ${currentUser.display_name}!`);
+        } catch (e) {
+          $('loginError').textContent = e.message;
+          $('loginError').classList.remove('hidden');
+        } finally {
+          $('loginBtn').disabled = false;
+          $('loginBtn').textContent = 'Sign In';
+        }
+      };
+
+      $('loginPass').onkeydown = e => { if (e.key === 'Enter') $('loginBtn').click(); };
+      
+      $('logoutBtn').onclick = () => {
+        currentUser = null;
+        localStorage.removeItem('adminUser');
+        $('adminPanel').classList.add('hidden');
+        $('loginScreen').classList.remove('hidden');
+        toast('Signed out');
+      };
+
+      // Tabs
+      $$('.tab').forEach(t => {
+        t.onclick = () => {
+          $$('.tab').forEach(x => x.classList.remove('active'));
+          t.classList.add('active');
+          $('accountsTab').classList.toggle('hidden', t.dataset.tab !== 'accounts');
+          $('playersTab').classList.toggle('hidden', t.dataset.tab !== 'players');
+        };
+      });
+
+      // Create account
+      $('createBtn').onclick = async () => {
+        const user = $('newUser').value.trim();
+        const pass = $('newPass').value;
+        const name = $('newName').value.trim();
+        const isAdmin = $('newRole').value === 'true';
+        
+        if (!user || !pass || !name) { toast('Fill all fields', 'error'); return; }
+        if (pass.length < 6) { toast('Password min 6 chars', 'error'); return; }
+        
+        $('createBtn').disabled = true;
+        const { error } = await supabase.from('testers').insert({ username: user, password: pass, display_name: name, is_admin: isAdmin });
+        $('createBtn').disabled = false;
+        
+        if (error) { toast(error.message.includes('duplicate') ? 'Username exists' : error.message, 'error'); return; }
+        
+        toast(`${user} created!`);
+        $('newUser').value = '';
+        $('newPass').value = '';
+        $('newName').value = '';
+        loadAccounts();
+      };
+
+      // Add player
+      $('addPlayerBtn').onclick = async () => {
+        const name = $('playerName').value.trim();
+        if (!name) { toast('Enter player name', 'error'); return; }
+        
+        $('addPlayerBtn').disabled = true;
+        const { error } = await supabase.from('players').upsert({
+          name,
+          category: $('playerCat').value,
+          tier: $('playerTier').value,
+          region: $('playerRegion').value,
+          tester: $('playerTester').value === 'true',
+          updated_at: new Date().toISOString()
+        }, { onConflict: 'name,category' });
+        $('addPlayerBtn').disabled = false;
+        
+        if (error) { toast(error.message, 'error'); return; }
+        toast(`${name} added!`);
+        $('playerName').value = '';
+        loadPlayers();
+      };
+
+      // Search
+      $('searchPlayer').oninput = debounce(() => renderPlayers($('searchPlayer').value.trim()), 300);
+    }
+
+    init();
+  </script>
+</body>
+</html>
