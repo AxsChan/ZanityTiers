@@ -1067,8 +1067,11 @@
           </div>`;
       }).join('');
       view.querySelectorAll('.player-card').forEach(card => {
-        card.addEventListener('click', () => openPlayerModal(card.dataset.name, parseInt(card.dataset.rank)));
-      });
+  card.addEventListener('click', (event) => {
+    event.stopPropagation();
+    openPlayerModal(card.dataset.name, parseInt(card.dataset.rank));
+  });
+});
     }
 
     function renderTierView(term) {
@@ -1100,8 +1103,11 @@
         </div>`;
       }).join('');
       view.querySelectorAll('.tier-player').forEach(el => {
-        el.addEventListener('click', () => openPlayerModal(el.dataset.name));
-      });
+  el.addEventListener('click', (event) => {
+    event.stopPropagation();
+    openPlayerModal(el.dataset.name);
+  });
+});
     }
 
     function openPlayerModal(name, rank = null) {
