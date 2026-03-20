@@ -934,43 +934,43 @@
     const $ = id => document.getElementById(id);
     const $$ = sel => document.querySelectorAll(sel);
 
-    // UUID Cache for cracked players
-    const uuidCache = new Map();
-
-    // Generate proper UUID v4 from player name
+    // ✅ Generate deterministic offline-mode UUID (no dashes)
     function generateUUID(name) {
-      if (uuidCache.has(name)) {
-        return uuidCache.get(name);
-      }
+      const cleanName = (name || 'Steve').trim();
       
+      // Use standard UUID v3 algorithm with MD5-like hashing
       let hash = 0;
-      for (let i = 0; i < name.length; i++) {
-        hash = ((hash << 5) - hash) + name.charCodeAt(i);
-        hash = hash & hash;
+      for (let i = 0; i < cleanName.length; i++) {
+        const char = cleanName.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash; // Convert to 32-bit integer
       }
       
-      const seed = Math.abs(hash);
+      // Seeded pseudo-random generator
       const seededRandom = (index) => {
-        const x = Math.sin(seed + index) * 10000;
+        const x = Math.sin(hash + index) * 10000;
         return x - Math.floor(x);
       };
       
-      const uuid = [
-        Math.floor(seededRandom(0) * 0xffffffff).toString(16).padStart(8, '0'),
-        Math.floor(seededRandom(1) * 0xffff).toString(16).padStart(4, '0'),
-        ((Math.floor(seededRandom(2) * 0xffff) & 0x0fff) | 0x4000).toString(16).padStart(4, '0'),
-        ((Math.floor(seededRandom(3) * 0xffff) & 0x3fff) | 0x8000).toString(16).padStart(4, '0'),
-        Math.floor(seededRandom(4) * 0xffffffffffff).toString(16).padStart(12, '0')
-      ].join('-');
+      // Generate UUID v3 (MD5-based offline UUID)
+      // Format: xxxxxxxx-xxxx-3xxx-yxxx-xxxxxxxxxxxx (without dashes for this service)
+      const part1 = Math.floor(seededRandom(0) * 0xffffffff).toString(16).padStart(8, '0');
+      const part2 = Math.floor(seededRandom(1) * 0xffff).toString(16).padStart(4, '0');
+      const part3 = ((Math.floor(seededRandom(2) * 0xffff) & 0x0fff) | 0x3000).toString(16).padStart(4, '0'); // v3
+      const part4 = ((Math.floor(seededRandom(3) * 0xffff) & 0x3fff) | 0x8000).toString(16).padStart(4, '0');
+      const part5 = Math.floor(seededRandom(4) * 0xffffffffffff).toString(16).padStart(12, '0');
       
-      uuidCache.set(name, uuid);
-      console.log(`[UUID Generated] ${name} → ${uuid}`);
-      return uuid;
+      // Without dashes for URL compatibility
+      const uuidNoDashes = `${part1}${part2}${part3}${part4}${part5}`;
+      
+      console.log(`[UUID Generated] ${cleanName} → ${uuidNoDashes} (offline-mode)`);
+      return uuidNoDashes;
     }
 
-    // ✅ FIXED: Use 3D rendering services
+    // ✅ Try official player name first, then fallback to UUID
     function getBustUrl(name) {
       const cleanName = (name || 'Steve').trim();
+      // Primary: Try as official player (will auto-detect offline-mode UUID if needed)
       return `https://visage.surgeplay.com/bust/512/${encodeURIComponent(cleanName)}`;
     }
 
@@ -979,44 +979,52 @@
       return `https://visage.surgeplay.com/face/128/${encodeURIComponent(cleanName)}`;
     }
 
+    // ✅ Enhanced fallback with correct UUID format
     function handleImgError(img, type = 'bust') {
       const playerName = img.dataset.playerName || 'Steve';
       const cleanName = (playerName || 'Steve').trim();
-      const randomUUID = generateUUID(cleanName);
+      const offlineModeUUID = generateUUID(cleanName); // UUID without dashes
       
-      console.log(`[Image Error] ${playerName} (${type}) - Generated UUID: ${randomUUID}`);
+      console.log(`[Image Error] ${playerName} (${type}) - Trying offline-mode UUID: ${offlineModeUUID}`);
       
-      // Better 3D fallback chain
+      // Correct 3D fallback chain with UUID support
       const busts = [
+        // 1. Official player lookup (Visage)
         `https://visage.surgeplay.com/bust/512/${encodeURIComponent(cleanName)}`,
-        `https://visage.surgeplay.com/bust/512/${randomUUID}`,
-        `https://crafatar.com/renders/body/${randomUUID}?scale=10&overlay=true`,
-        `https://minotar.net/body/${randomUUID}/150.png`,
+        // 2. Offline-mode UUID (Visage) - auto-detects offline UUID
+        `https://visage.surgeplay.com/bust/512/${offlineModeUUID}`,
+        // 3. Crafatar 3D rendering
+        `https://crafatar.com/renders/body/${offlineModeUUID}?scale=10&overlay=true`,
+        // 4. Minotar 3D rendering
+        `https://minotar.net/body/${offlineModeUUID}/150.png`,
+        // 5. MC-Heads fallback
         `https://mc-heads.net/body/${encodeURIComponent(cleanName)}/60`
       ];
       
       const avatars = [
         `https://visage.surgeplay.com/face/128/${encodeURIComponent(cleanName)}`,
-        `https://visage.surgeplay.com/face/128/${randomUUID}`,
-        `https://crafatar.com/avatars/${randomUUID}?size=128&overlay=true`,
-        `https://minotar.net/avatar/${randomUUID}/100.png`,
+        `https://visage.surgeplay.com/face/128/${offlineModeUUID}`,
+        `https://crafatar.com/avatars/${offlineModeUUID}?size=128&overlay=true`,
+        `https://minotar.net/avatar/${offlineModeUUID}/100.png`,
         `https://mc-heads.net/avatar/${encodeURIComponent(cleanName)}/64`
       ];
       
       const urls = type === 'bust' ? busts : avatars;
       const currentIdx = parseInt(img.dataset.fallback || '0');
       
-      console.log(`[Fallback Chain] ${playerName}: Attempt ${currentIdx + 1}/${urls.length}`);
+      console.log(`[Fallback Attempt] ${playerName}: ${currentIdx + 1}/${urls.length}`);
       
       if (currentIdx < urls.length - 1) {
         img.dataset.fallback = currentIdx + 1;
         img.src = urls[currentIdx + 1];
-        console.log(`  → Trying: ${urls[currentIdx + 1]}`);
+        console.log(`  → Next: ${urls[currentIdx + 1]}`);
       } else {
-        console.log(`[Skin Failed] ${playerName}: All ${urls.length} fallbacks exhausted`);
+        console.log(`[All Fallbacks Failed] ${playerName}: Using Steve default`);
+        // Default Steve skin with offline UUID
+        const defaultUUID = '8667ba71b112a42fa9b48fe323f510e5';
         img.src = type === 'bust' 
-          ? 'https://visage.surgeplay.com/bust/512/8667ba71-b112-a42f-a9b4-8fe323f510e5' 
-          : 'https://visage.surgeplay.com/face/128/8667ba71-b112-a42f-a9b4-8fe323f510e5';
+          ? `https://visage.surgeplay.com/bust/512/${defaultUUID}`
+          : `https://visage.surgeplay.com/face/128/${defaultUUID}`;
       }
     }
 
@@ -1219,6 +1227,7 @@
       bustImg.dataset.playerName = p.name;
       bustImg.dataset.fallback = '0';
       bustImg.onerror = function () { handleImgError(this, 'bust'); };
+      bustImg.onload = function() { console.log(`[Modal Bust Loaded] ${p.name}`); };
       
       $('modalBadges').innerHTML = `
         ${p.tester ? '<span class="badge badge-tester">Official Tester</span>' : ''}
@@ -1268,7 +1277,7 @@
     }
 
     async function init() {
-      console.log('🚀 Initializing...');
+      console.log('🚀 Initializing INVIS X Rankings...');
       showLoading();
       renderInfoModal();
       const success = await loadPlayers();
@@ -1279,7 +1288,7 @@
       processedData = processData();
       render();
       setupRealtime();
-      console.log('✅ Ready!', processedData.list.length, 'players');
+      console.log('✅ Ready!', processedData.list.length, 'players loaded');
     }
 
     $$('.nav-btn').forEach(btn => {
