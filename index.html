@@ -643,15 +643,12 @@
 
   <script>
     // =============================================
-    // SUPABASE CONFIG
+    // SUPABASE CONFIG - FIXED (NO DUPLICATE!)
     // =============================================
-    const SUPABASE_URL = 'https://sqvnsyvcxcsckfrruezq.supabase.co'; // ✅ This is correct
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxdm5zeXZjeGNzY2tmcnJ1ZXpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5Njc1MTIsImV4cCI6MjA4OTU0MzUxMn0.8PZYAwk3A--v0re9rjdaR8buggFGM6EjEjTvCMBuJew'; // ⚠️ Get this from API settings
+    const SUPABASE_URL = 'https://sqvnsyvcxcsckfrruezq.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxdm5zeXZjeGNzY2tmcnJ1ZXpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5Njc1MTIsImV4cCI6MjA4OTU0MzUxMn0.8PZYAwk3A--v0re9rjdaR8buggFGM6EjEjTvCMBuJew';
     
-    // Initialize Supabase Client
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    
-    // Initialize Supabase Client
+    // Initialize Supabase Client - ONLY ONCE!
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     // =============================================
@@ -1321,6 +1318,5 @@
     initApp();
   </script>
 
-<script src="https://static.app/js/static.js" type="text/javascript"></script>
 </body>
 </html>
