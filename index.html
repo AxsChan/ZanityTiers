@@ -6,10 +6,7 @@
   <title>INVIS X | Ranked</title>
 
   <!-- Tailwind CSS -->
-  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-  
-  <!-- Supabase JS Client -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -56,7 +53,6 @@
 
     .app-layout { display: flex; min-height: 100vh; }
 
-    /* Sidebar */
     .sidebar {
       width: 260px;
       background: var(--bg-sidebar);
@@ -88,12 +84,9 @@
       background: #1a1a1a; color: #fff; border-color: #333; font-weight: 600;
       box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     }
-    .nav-btn img { width: 20px; height: 20px; object-fit: contain; opacity: 0.6; transition: 0.2s; }
-    .nav-btn[aria-pressed="true"] img { opacity: 1; }
     
     .sidebar-footer { padding: 20px; border-top: 1px solid var(--border-main); font-size: 0.75rem; color: #444; text-align: center; }
 
-    /* Main */
     .main-content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
 
     .topbar {
@@ -109,11 +102,10 @@
       display: flex; align-items: center; gap: 6px;
       font-size: 0.7rem; color: #555; margin-left: 12px;
     }
-    .status-dot {
-      width: 8px; height: 8px; border-radius: 50%; background: #555;
-    }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #555; }
     .status-dot.connected { background: #22c55e; box-shadow: 0 0 8px rgba(34,197,94,0.5); }
     .status-dot.loading { background: #eab308; animation: pulse 1s infinite; }
+    .status-dot.error { background: #ef4444; }
 
     @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
@@ -126,12 +118,6 @@
     }
     .search-input:focus { border-color: #555; background: #161616; }
     .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #555; pointer-events: none; }
-
-    .btn-icon {
-      height: 38px; width: 38px; border-radius: 8px; border: 1px solid var(--border-main);
-      background: #0f0f0f; color: #aaa; display: grid; place-items: center; transition: 0.2s;
-    }
-    .btn-icon:hover { background: #1a1a1a; color: #fff; border-color: #555; }
 
     .btn-info {
       height: 38px; padding: 0 16px; border-radius: 8px; border: 1px solid var(--border-main);
@@ -147,7 +133,6 @@
 
     .content-area { padding: 32px; flex: 1; }
 
-    /* Loading State */
     .loading-container {
       display: flex; flex-direction: column; align-items: center; justify-content: center;
       padding: 80px 20px; color: #555;
@@ -158,10 +143,7 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* Error State */
-    .error-container {
-      text-align: center; padding: 60px 20px; color: #666;
-    }
+    .error-container { text-align: center; padding: 60px 20px; color: #666; }
     .error-icon { font-size: 3rem; margin-bottom: 16px; }
     .error-title { font-size: 1.1rem; color: #999; margin-bottom: 8px; }
     .error-msg { font-size: 0.85rem; color: #555; margin-bottom: 20px; }
@@ -171,7 +153,6 @@
     }
     .btn-retry:hover { background: #222; border-color: #444; }
 
-    /* Overall List */
     .overall-grid { display: grid; gap: 8px; }
 
     .player-card-row {
@@ -182,13 +163,6 @@
     .player-card-row:hover {
       transform: translateY(-2px); border-color: #444; background: var(--bg-card-hover);
       box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-    }
-    .player-card-row.new-entry {
-      animation: highlightNew 2s ease-out;
-    }
-    @keyframes highlightNew {
-      0% { background: rgba(34,197,94,0.2); border-color: rgba(34,197,94,0.5); }
-      100% { background: var(--bg-card); border-color: var(--border-main); }
     }
 
     .rank-num { font-family: var(--font-display); font-weight: 700; font-size: 1.1rem; color: #444; text-align: center; }
@@ -217,7 +191,6 @@
     }
     .mini-pill:not(:empty) { color: #fff; background: #222; border-color: #444; }
 
-    /* Tier Board */
     .tier-board { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; align-items: start; }
 
     .tier-col {
@@ -228,7 +201,7 @@
     .tier-header {
       padding: 12px; text-align: center; font-family: var(--font-display);
       font-weight: 800; font-size: 0.9rem; letter-spacing: 0.05em;
-      background: #141414; border-bottom: 1px solid var(--border-main); position: relative;
+      background: #141414; border-bottom: 1px solid var(--border-main);
     }
     
     .tier-col:nth-child(1) { border-top: 3px solid var(--t1); }
@@ -242,11 +215,11 @@
     .tier-col:nth-child(5) { border-top: 3px solid var(--t5); }
     .tier-col:nth-child(5) .tier-header { color: var(--t5); background: linear-gradient(180deg, rgba(59,130,246,0.1), transparent); }
 
-    .tier-list { padding: 8px; max-height: 75vh; overflow-y: auto; scrollbar-width: thin; scrollbar-color: #333 transparent; }
+    .tier-list { padding: 8px; max-height: 75vh; overflow-y: auto; }
 
     .tier-player {
       display: flex; align-items: center; gap: 10px; padding: 8px;
-      border-radius: 6px; cursor: pointer; transition: 0.1s; border-bottom: 1px solid rgba(255,255,255,0.02);
+      border-radius: 6px; cursor: pointer; transition: 0.1s;
     }
     .tier-player:hover { background: #1f1f1f; }
     .tp-head { width: 24px; height: 24px; border-radius: 4px; object-fit: cover; }
@@ -263,7 +236,6 @@
     [data-tier*="4"] { color: var(--t4); border-color: rgba(34,197,94,0.4); background: rgba(34,197,94,0.1); }
     [data-tier*="5"] { color: var(--t5); border-color: rgba(59,130,246,0.4); background: rgba(59,130,246,0.1); }
 
-    /* Modals */
     .modal-backdrop {
       position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);
       z-index: 100; display: none; align-items: center; justify-content: center; padding: 20px;
@@ -286,7 +258,7 @@
     }
     .m-close-absolute:hover { color: #fff; }
 
-    .pfp-container { display: flex; justify-content: center; margin-bottom: 16px; position: relative; }
+    .pfp-container { display: flex; justify-content: center; margin-bottom: 16px; }
     .pfp-img {
       width: 96px; height: 96px; border-radius: 16px; border: 2px solid #333;
       box-shadow: 0 8px 24px rgba(0,0,0,0.4); background: #111; object-fit: cover;
@@ -314,12 +286,10 @@
     .bd-item { display: flex; flex-direction: column; align-items: center; gap: 4px; width: 44px; }
     .bd-icon {
       width: 32px; height: 32px; background: #1a1a1a; border-radius: 6px;
-      display: grid; place-items: center; border: 1px solid #333;
+      display: grid; place-items: center; border: 1px solid #333; font-size: 0.9rem;
     }
-    .bd-icon img { width: 16px; height: 16px; opacity: 0.8; }
     .bd-badge { font-size: 0.65rem; font-weight: 700; padding: 2px 0; width: 100%; text-align: center; border-radius: 4px; }
 
-    /* Admin Modal Specific */
     .admin-modal { max-width: 600px; }
     .admin-header { margin-bottom: 24px; text-align: center; }
     .admin-title { font-family: var(--font-display); font-size: 1.5rem; font-weight: 800; color: #fff; margin-bottom: 8px; }
@@ -357,13 +327,6 @@
     .btn-submit:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(59,130,246,0.3); }
     .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
-    .btn-delete {
-      width: 100%; padding: 12px; border-radius: 8px; border: 1px solid rgba(239,68,68,0.3);
-      background: rgba(239,68,68,0.1); color: #ef4444;
-      font-weight: 700; font-size: 0.95rem; cursor: pointer; transition: 0.2s;
-    }
-    .btn-delete:hover { background: rgba(239,68,68,0.2); border-color: rgba(239,68,68,0.5); }
-
     .toast {
       position: fixed; bottom: 24px; right: 24px; padding: 14px 20px;
       border-radius: 10px; font-weight: 600; font-size: 0.9rem;
@@ -373,7 +336,6 @@
     .toast.success { background: #22c55e; color: #fff; }
     .toast.error { background: #ef4444; color: #fff; }
 
-    /* Auth Form */
     .auth-form { text-align: center; }
     .auth-input {
       width: 100%; padding: 12px 16px; border-radius: 8px; border: 1px solid #333;
@@ -381,7 +343,6 @@
     }
     .auth-input:focus { border-color: #555; }
 
-    /* Responsive */
     @media (max-width: 1024px) { .tier-board { grid-template-columns: repeat(3, 1fr); } }
     @media (max-width: 768px) {
       .app-layout { flex-direction: column; }
@@ -405,7 +366,6 @@
   <div class="bg-glow"></div>
 
   <div class="app-layout">
-    <!-- SIDEBAR -->
     <aside class="sidebar">
       <div class="sidebar-header">
         <div class="brand">INVIS X</div>
@@ -413,38 +373,19 @@
       </div>
       
       <nav class="nav-scroll" id="filterTabs">
-        <button class="nav-btn" data-filter="overall" aria-pressed="true">
-          <img src="overall.png" alt="" onerror="this.style.display='none'"> Overall
-        </button>
-        <button class="nav-btn" data-filter="sword" aria-pressed="false">
-          <img src="sword.png" alt="" onerror="this.style.display='none'"> Sword
-        </button>
-        <button class="nav-btn" data-filter="axe" aria-pressed="false">
-          <img src="axe.png" alt="" onerror="this.style.display='none'"> Axe
-        </button>
-        <button class="nav-btn" data-filter="crystal" aria-pressed="false">
-          <img src="crystal.png" alt="" onerror="this.style.display='none'"> Crystal
-        </button>
-        <button class="nav-btn" data-filter="nethpot" aria-pressed="false">
-          <img src="nethpot.png" alt="" onerror="this.style.display='none'"> Nethpot
-        </button>
-        <button class="nav-btn" data-filter="uhc" aria-pressed="false">
-          <img src="uhc.png" alt="" onerror="this.style.display='none'"> UHC
-        </button>
-        <button class="nav-btn" data-filter="smp" aria-pressed="false">
-          <img src="smp.png" alt="" onerror="this.style.display='none'"> SMP
-        </button>
-        <button class="nav-btn" data-filter="mace" aria-pressed="false">
-          <img src="mace.png" alt="" onerror="this.style.display='none'"> Mace
-        </button>
+        <button class="nav-btn" data-filter="overall" aria-pressed="true">📊 Overall</button>
+        <button class="nav-btn" data-filter="sword" aria-pressed="false">⚔️ Sword</button>
+        <button class="nav-btn" data-filter="axe" aria-pressed="false">🪓 Axe</button>
+        <button class="nav-btn" data-filter="crystal" aria-pressed="false">💎 Crystal</button>
+        <button class="nav-btn" data-filter="nethpot" aria-pressed="false">🧪 Nethpot</button>
+        <button class="nav-btn" data-filter="uhc" aria-pressed="false">❤️ UHC</button>
+        <button class="nav-btn" data-filter="smp" aria-pressed="false">🏠 SMP</button>
+        <button class="nav-btn" data-filter="mace" aria-pressed="false">🔨 Mace</button>
       </nav>
 
-      <div class="sidebar-footer">
-        &copy; 2025 INVIS X
-      </div>
+      <div class="sidebar-footer">&copy; 2025 INVIS X</div>
     </aside>
 
-    <!-- MAIN CONTENT -->
     <main class="main-content">
       <header class="topbar">
         <div style="display: flex; align-items: center;">
@@ -477,21 +418,16 @@
   <div id="modalBackdrop" class="modal-backdrop">
     <div class="modal">
       <button id="mClose" class="m-close-absolute">&times;</button>
-      
       <div class="pfp-container">
         <img id="mHead" src="" class="pfp-img" alt="">
       </div>
-
-      <div id="mTesterRow" class="badge-row hidden" style="display:flex; justify-content:center; margin-bottom:12px;">
+      <div id="mTesterRow" class="hidden" style="display:flex; justify-content:center; margin-bottom:12px;">
         <div class="role-badge tester" style="padding:4px 10px; font-size:0.7rem;">OFFICIAL TESTER</div>
       </div>
-
       <div id="mName" class="profile-name">Player</div>
-
       <div class="title-row">
         <div id="mTitle" class="title-pill">Title</div>
       </div>
-
       <div class="stats-row">
         <div class="stat-item">
           <div class="stat-lbl">Rank</div>
@@ -499,14 +435,13 @@
         </div>
         <div class="stat-item">
           <div class="stat-lbl">Region</div>
-          <div id="mRegion" class="stat-val">ASIA</div>
+          <div id="mRegion" class="stat-val">NA</div>
         </div>
         <div class="stat-item">
           <div class="stat-lbl">Points</div>
-          <div id="mPoints" class="stat-val">58</div>
+          <div id="mPoints" class="stat-val">0</div>
         </div>
       </div>
-
       <div class="breakdown-box">
         <div class="bb-title">Tiers Breakdown</div>
         <div id="mBreakdown" class="bb-grid"></div>
@@ -536,36 +471,29 @@
   <div id="adminBackdrop" class="modal-backdrop">
     <div class="modal admin-modal">
       <button id="adminClose" class="m-close-absolute">&times;</button>
-      
       <div class="admin-header">
         <div class="admin-title">🔐 Admin Panel</div>
         <div class="admin-subtitle" id="adminSubtitle">Manage player rankings</div>
       </div>
 
-      <!-- Auth Form (shown when not logged in) -->
       <div id="authForm" class="auth-form">
         <input type="email" id="authEmail" class="auth-input" placeholder="Email">
         <input type="password" id="authPassword" class="auth-input" placeholder="Password">
         <button id="loginBtn" class="btn-submit">Sign In</button>
-        <p style="margin-top: 16px; font-size: 0.8rem; color: #555;">
-          Contact admin for credentials
-        </p>
+        <p style="margin-top: 16px; font-size: 0.8rem; color: #555;">Contact admin for credentials</p>
       </div>
 
-      <!-- Admin Panel (shown when logged in) -->
       <div id="adminPanel" class="hidden">
         <div class="admin-tabs">
           <button class="admin-tab active" data-tab="add">Add Player</button>
           <button class="admin-tab" data-tab="edit">Edit/Delete</button>
         </div>
 
-        <!-- Add Player Form -->
         <div id="addForm">
           <div class="form-group">
             <label class="form-label">Player Name</label>
             <input type="text" id="addName" class="form-input" placeholder="e.g. Technoblade">
           </div>
-          
           <div class="form-row">
             <div class="form-group">
               <label class="form-label">Category</label>
@@ -595,7 +523,6 @@
               </select>
             </div>
           </div>
-
           <div class="form-row">
             <div class="form-group">
               <label class="form-label">Region</label>
@@ -614,265 +541,307 @@
               </label>
             </div>
           </div>
-
           <button id="submitAdd" class="btn-submit">Add Player Entry</button>
         </div>
 
-        <!-- Edit Form -->
         <div id="editForm" class="hidden">
           <div class="form-group">
             <label class="form-label">Search Player</label>
             <input type="text" id="editSearch" class="form-input" placeholder="Search by name...">
           </div>
-          
           <div id="editResults" style="max-height: 300px; overflow-y: auto; margin-bottom: 16px;"></div>
         </div>
 
-        <!-- Logout -->
         <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid #222; text-align: center;">
-          <button id="logoutBtn" style="background: transparent; border: none; color: #666; font-size: 0.85rem; cursor: pointer;">
-            Sign Out
-          </button>
+          <button id="logoutBtn" style="background: transparent; border: none; color: #666; font-size: 0.85rem; cursor: pointer;">Sign Out</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Toast Notification -->
   <div id="toast" class="toast"></div>
 
-  <script>
+  <!-- SCRIPT AS ES MODULE -->
+  <script type="module">
     // =============================================
-    // SUPABASE CONFIG - FIXED (NO DUPLICATE!)
+    // IMPORT SUPABASE
     // =============================================
+    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
     const SUPABASE_URL = 'https://sqvnsyvcxcsckfrruezq.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxdm5zeXZjeGNzY2tmcnJ1ZXpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5Njc1MTIsImV4cCI6MjA4OTU0MzUxMn0.8PZYAwk3A--v0re9rjdaR8buggFGM6EjEjTvCMBuJew';
-    
-    // Initialize Supabase Client - ONLY ONCE!
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    console.log('✅ Supabase connected');
 
     // =============================================
-    // DATA & STATE
+    // STATE
     // =============================================
     let players = [];
     let currentUser = null;
-    let realtimeSubscription = null;
+    let currentFilter = "overall";
+    let processedData = { list: [], map: new Map() };
 
     const CATEGORIES = ["sword", "axe", "crystal", "nethpot", "uhc", "smp", "mace"];
-    const CAT_ICONS = {
-      sword: "sword.png", axe: "axe.png", crystal: "crystal.png",
-      nethpot: "nethpot.png", uhc: "uhc.png", smp: "smp.png", mace: "mace.png"
-    };
-
-    const POINTS_MAP = {
-      "HT1": 60, "LT1": 30, "HT2": 30, "LT2": 15,
-      "HT3": 15, "LT3": 14, "HT4": 8, "LT4": 6, "HT5": 4, "LT5": 1
-    };
-
+    const CAT_ICONS = { sword: "⚔️", axe: "🪓", crystal: "💎", nethpot: "🧪", uhc: "❤️", smp: "🏠", mace: "🔨" };
+    const POINTS_MAP = { "HT1": 60, "LT1": 30, "HT2": 30, "LT2": 15, "HT3": 15, "LT3": 14, "HT4": 8, "LT4": 6, "HT5": 4, "LT5": 1 };
     const TITLES = [
-      { min: 400, t: "Grandmaster" },
-      { min: 250, t: "Master" },
-      { min: 100, t: "Ace" },
-      { min: 50, t: "Specialist" },
-      { min: 20, t: "Cadet" },
-      { min: 10, t: "Novice" },
-      { min: 0, t: "Beginner" }
+      { min: 400, t: "Grandmaster" }, { min: 250, t: "Master" }, { min: 100, t: "Ace" },
+      { min: 50, t: "Specialist" }, { min: 20, t: "Cadet" }, { min: 10, t: "Novice" }, { min: 0, t: "Beginner" }
     ];
 
     // =============================================
-    // UTILITY FUNCTIONS
+    // UTILITIES
     // =============================================
-    function getImageUrl(name, type = 'bust') {
+    const getImageUrl = (name, type = 'bust') => {
       const cleanName = name ? name.trim() : 'MHF_Steve';
-      return type === 'bust' 
-        ? `https://vzge.me/bust/${cleanName}` 
-        : `https://vzge.me/face/${cleanName}`;
-    }
+      return type === 'bust' ? `https://vzge.me/bust/${cleanName}` : `https://vzge.me/face/${cleanName}`;
+    };
 
-    function getPoints(tier) { return POINTS_MAP[tier] || 0; }
-    function getTitle(pts) { return TITLES.find(x => pts >= x.min).t; }
+    const getPoints = (tier) => POINTS_MAP[tier] || 0;
+    const getTitle = (pts) => TITLES.find(x => pts >= x.min).t;
 
-    function showToast(message, type = 'success') {
+    const showToast = (message, type = 'success') => {
       const toast = document.getElementById('toast');
       toast.textContent = message;
       toast.className = `toast ${type} show`;
       setTimeout(() => toast.classList.remove('show'), 3000);
-    }
+    };
 
-    function updateConnectionStatus(status) {
-      const dot = document.getElementById('statusDot');
-      const text = document.getElementById('statusText');
-      
-      if (status === 'connected') {
-        dot.className = 'status-dot connected';
-        text.textContent = 'Live';
-      } else if (status === 'loading') {
-        dot.className = 'status-dot loading';
-        text.textContent = 'Syncing...';
-      } else {
-        dot.className = 'status-dot';
-        text.textContent = 'Offline';
-      }
-    }
+    const updateStatus = (status) => {
+      document.getElementById('statusDot').className = 'status-dot ' + status;
+      document.getElementById('statusText').textContent = 
+        status === 'connected' ? 'Live' : status === 'loading' ? 'Syncing...' : 'Offline';
+    };
 
-    function debounce(func, wait) {
+    const debounce = (func, wait) => {
       let timeout;
-      return function(...args) {
-        clearTimeout(timeout);
-        timeout = setTimeout(() => func.apply(this, args), wait);
-      };
-    }
+      return (...args) => { clearTimeout(timeout); timeout = setTimeout(() => func(...args), wait); };
+    };
 
     // =============================================
-    // SUPABASE DATA OPERATIONS
+    // DATA OPERATIONS
     // =============================================
     async function loadPlayers() {
-      updateConnectionStatus('loading');
-      
+      updateStatus('loading');
       try {
-        const { data, error } = await supabase
-          .from('players')
-          .select('*')
-          .order('name');
-        
+        const { data, error } = await supabase.from('players').select('*').order('name');
         if (error) throw error;
-        
-        // Transform to expected format
-        players = data.map(p => ({
-          id: p.id,
-          name: p.name,
-          cat: p.category,
-          tier: p.tier,
-          region: p.region,
-          tester: p.tester
+        console.log('✅ Loaded', data.length, 'players');
+        players = (data || []).map(p => ({
+          id: p.id, name: p.name, cat: p.category, tier: p.tier, 
+          region: p.region || 'NA', tester: p.tester || false
         }));
-        
-        updateConnectionStatus('connected');
+        updateStatus('connected');
         return true;
       } catch (err) {
-        console.error('Failed to load players:', err);
-        updateConnectionStatus('error');
+        console.error('❌ Load error:', err);
+        updateStatus('error');
         return false;
       }
     }
 
     async function addPlayer(playerData) {
       try {
-        const { data, error } = await supabase
-          .from('players')
-          .upsert({
-            name: playerData.name,
-            category: playerData.category,
-            tier: playerData.tier,
-            region: playerData.region,
-            tester: playerData.tester
-          }, { onConflict: 'name,category' })
-          .select();
-        
+        const { error } = await supabase.from('players').upsert({
+          name: playerData.name, category: playerData.category, tier: playerData.tier,
+          region: playerData.region, tester: playerData.tester
+        }, { onConflict: 'name,category' });
         if (error) throw error;
-        showToast(`${playerData.name} added to ${playerData.category}!`);
-        return data;
-      } catch (err) {
-        console.error('Add player error:', err);
-        showToast(err.message || 'Failed to add player', 'error');
-        return null;
-      }
-    }
-
-    async function updatePlayer(id, updates) {
-      try {
-        const { error } = await supabase
-          .from('players')
-          .update(updates)
-          .eq('id', id);
-        
-        if (error) throw error;
-        showToast('Player updated!');
+        showToast(`${playerData.name} added!`);
+        await refreshData();
         return true;
       } catch (err) {
-        console.error('Update error:', err);
-        showToast(err.message || 'Failed to update', 'error');
+        showToast(err.message || 'Failed to add', 'error');
         return false;
       }
     }
 
-    async function deletePlayer(id, name) {
-      if (!confirm(`Delete ${name}?`)) return false;
-      
+    async function deletePlayerById(id, name) {
+      if (!confirm(`Delete ${name}?`)) return;
       try {
-        const { error } = await supabase
-          .from('players')
-          .delete()
-          .eq('id', id);
-        
+        const { error } = await supabase.from('players').delete().eq('id', id);
         if (error) throw error;
         showToast(`${name} deleted`);
-        return true;
+        await refreshData();
       } catch (err) {
-        console.error('Delete error:', err);
         showToast(err.message || 'Failed to delete', 'error');
-        return false;
       }
     }
 
-    // =============================================
-    // REAL-TIME SUBSCRIPTION
-    // =============================================
-    function setupRealtimeSubscription() {
-      realtimeSubscription = supabase
-        .channel('players-changes')
-        .on('postgres_changes', { 
-          event: '*', 
-          schema: 'public', 
-          table: 'players' 
-        }, (payload) => {
-          console.log('Realtime update:', payload);
-          handleRealtimeUpdate(payload);
-        })
-        .subscribe((status) => {
-          console.log('Subscription status:', status);
-          if (status === 'SUBSCRIBED') {
-            updateConnectionStatus('connected');
-          }
-        });
-    }
+    // Make deletePlayer available globally for onclick
+    window.deletePlayer = deletePlayerById;
 
-    async function handleRealtimeUpdate(payload) {
-      const { eventType, new: newRecord, old: oldRecord } = payload;
-      
-      if (eventType === 'INSERT') {
-        players.push({
-          id: newRecord.id,
-          name: newRecord.name,
-          cat: newRecord.category,
-          tier: newRecord.tier,
-          region: newRecord.region,
-          tester: newRecord.tester
-        });
-      } else if (eventType === 'UPDATE') {
-        const idx = players.findIndex(p => p.id === newRecord.id);
-        if (idx !== -1) {
-          players[idx] = {
-            id: newRecord.id,
-            name: newRecord.name,
-            cat: newRecord.category,
-            tier: newRecord.tier,
-            region: newRecord.region,
-            tester: newRecord.tester
-          };
-        }
-      } else if (eventType === 'DELETE') {
-        const idx = players.findIndex(p => p.id === oldRecord.id);
-        if (idx !== -1) players.splice(idx, 1);
-      }
-      
-      // Re-process and re-render
+    async function refreshData() {
+      await loadPlayers();
       processedData = processData();
       render();
     }
 
     // =============================================
-    // AUTHENTICATION
+    // DATA PROCESSING
+    // =============================================
+    function processData() {
+      const map = new Map();
+      players.forEach(p => {
+        if (!CATEGORIES.includes(p.cat)) return;
+        if (!map.has(p.name)) {
+          map.set(p.name, { name: p.name, region: p.region || '—', tester: !!p.tester, tiers: {}, points: 0 });
+        }
+        const entry = map.get(p.name);
+        if (!entry.tiers[p.cat] || getPoints(p.tier) > getPoints(entry.tiers[p.cat])) {
+          entry.tiers[p.cat] = p.tier;
+        }
+        if (p.tester) entry.tester = true;
+      });
+      for (let p of map.values()) {
+        p.points = Object.values(p.tiers).reduce((sum, t) => sum + getPoints(t), 0);
+        p.title = getTitle(p.points);
+      }
+      return { 
+        list: Array.from(map.values()).sort((a, b) => b.points - a.points || a.name.localeCompare(b.name)), 
+        map 
+      };
+    }
+
+    // =============================================
+    // RENDERING
+    // =============================================
+    function showLoading() {
+      document.getElementById("overallView").innerHTML = `
+        <div class="loading-container"><div class="spinner"></div><div>Loading rankings...</div></div>`;
+    }
+
+    function showError(msg) {
+      document.getElementById("overallView").innerHTML = `
+        <div class="error-container">
+          <div class="error-icon">⚠️</div>
+          <div class="error-title">Failed to load</div>
+          <div class="error-msg">${msg}</div>
+          <button class="btn-retry" onclick="location.reload()">Retry</button>
+        </div>`;
+    }
+
+    function render() {
+      const term = document.getElementById("searchInput").value.toLowerCase();
+      document.getElementById("pageTitle").textContent = currentFilter.charAt(0).toUpperCase() + currentFilter.slice(1);
+      
+      if (currentFilter === "overall") {
+        document.getElementById("tierView").classList.add("hidden");
+        document.getElementById("overallView").classList.remove("hidden");
+        renderOverall(term);
+      } else {
+        document.getElementById("overallView").classList.add("hidden");
+        document.getElementById("tierView").classList.remove("hidden");
+        renderTier(term);
+      }
+    }
+
+    function renderOverall(term) {
+      const view = document.getElementById("overallView");
+      const filtered = processedData.list.filter(p => p.name.toLowerCase().includes(term));
+      
+      if (!filtered.length) {
+        view.innerHTML = `<div style="text-align:center;padding:40px;color:#555;">No players found.</div>`;
+        return;
+      }
+
+      view.innerHTML = filtered.map((p, idx) => `
+        <div class="player-card-row" data-name="${p.name}" data-rank="${idx + 1}">
+          <div class="rank-num ${idx < 3 ? 'top-3' : ''}">#${idx + 1}</div>
+          <div class="player-info">
+            <img src="${getImageUrl(p.name)}" class="player-head" loading="lazy" onerror="this.src='https://vzge.me/bust/MHF_Steve'">
+            <div class="player-details">
+              <div class="player-name">${p.name}</div>
+              <div class="player-meta">
+                ${p.tester ? '<span class="role-badge tester">TESTER</span>' : ''}
+                <span class="role-badge">${p.region}</span>
+                <span>${p.title}</span>
+              </div>
+            </div>
+          </div>
+          <div class="player-stats">
+            <div class="tier-pills">${CATEGORIES.map(c => `<div class="mini-pill" data-tier="${p.tiers[c] || ''}">${p.tiers[c] || ''}</div>`).join('')}</div>
+            <div class="stat-box">
+              <div class="stat-label">Points</div>
+              <div class="stat-value">${p.points}</div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      view.querySelectorAll('.player-card-row').forEach(card => {
+        card.onclick = () => openModal(card.dataset.name, parseInt(card.dataset.rank));
+      });
+    }
+
+    function renderTier(term) {
+      const view = document.getElementById("tierView");
+      const tierMap = { 1: [], 2: [], 3: [], 4: [], 5: [] };
+      
+      players.filter(p => p.cat === currentFilter && p.name.toLowerCase().includes(term)).forEach(p => {
+        const m = p.tier.match(/(\d)$/);
+        if (m) tierMap[parseInt(m[1])]?.push(p);
+      });
+
+      Object.keys(tierMap).forEach(k => {
+        tierMap[k].sort((a, b) => (b.tier.startsWith("HT") - a.tier.startsWith("HT")) || a.name.localeCompare(b.name));
+      });
+
+      view.innerHTML = [1, 2, 3, 4, 5].map(num => `
+        <div class="tier-col">
+          <div class="tier-header">TIER ${num}</div>
+          <div class="tier-list">
+            ${tierMap[num].length ? tierMap[num].map(p => `
+              <div class="tier-player" data-name="${p.name}">
+                <img src="${getImageUrl(p.name, 'face')}" class="tp-head" loading="lazy" onerror="this.src='https://vzge.me/face/MHF_Steve'">
+                <div class="tp-name">${p.name}</div>
+                <div class="tp-badge" data-tier="${p.tier}">${p.tier}</div>
+              </div>
+            `).join('') : '<div style="padding:20px;text-align:center;color:#444;">—</div>'}
+          </div>
+        </div>
+      `).join('');
+
+      view.querySelectorAll('.tier-player').forEach(el => {
+        el.onclick = () => openModal(el.dataset.name);
+      });
+    }
+
+    // =============================================
+    // MODALS
+    // =============================================
+    function openModal(name, rank = null) {
+      const p = processedData.map.get(name);
+      if (!p) return;
+      
+      if (!rank) rank = processedData.list.indexOf(p) + 1;
+      
+      document.getElementById("mHead").src = getImageUrl(p.name);
+      document.getElementById("mName").textContent = p.name;
+      document.getElementById("mTesterRow").classList.toggle("hidden", !p.tester);
+      document.getElementById("mTitle").textContent = p.title;
+      document.getElementById("mRank").textContent = `#${rank}`;
+      document.getElementById("mRank").classList.toggle("glow", rank <= 3);
+      document.getElementById("mPoints").textContent = p.points;
+      document.getElementById("mRegion").textContent = p.region;
+      
+      document.getElementById("mBreakdown").innerHTML = CATEGORIES.map(c => `
+        <div class="bd-item">
+          <div class="bd-icon">${CAT_ICONS[c]}</div>
+          <div class="bd-badge" data-tier="${p.tiers[c] || ''}">${p.tiers[c] || '-'}</div>
+        </div>
+      `).join('');
+      
+      document.getElementById("modalBackdrop").classList.add("show");
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove("show");
+    }
+
+    // =============================================
+    // AUTH
     // =============================================
     async function checkAuth() {
       const { data: { session } } = await supabase.auth.getSession();
@@ -882,15 +851,11 @@
 
     async function signIn(email, password) {
       try {
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email, password
-        });
-        
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        
         currentUser = data.user;
         updateAdminUI();
-        showToast('Signed in successfully!');
+        showToast('Signed in!');
       } catch (err) {
         showToast(err.message || 'Sign in failed', 'error');
       }
@@ -904,348 +869,125 @@
     }
 
     function updateAdminUI() {
-      const authForm = document.getElementById('authForm');
-      const adminPanel = document.getElementById('adminPanel');
-      const adminSubtitle = document.getElementById('adminSubtitle');
-      
-      if (currentUser) {
-        authForm.classList.add('hidden');
-        adminPanel.classList.remove('hidden');
-        adminSubtitle.textContent = `Logged in as ${currentUser.email}`;
-      } else {
-        authForm.classList.remove('hidden');
-        adminPanel.classList.add('hidden');
-        adminSubtitle.textContent = 'Sign in to manage rankings';
-      }
+      document.getElementById('authForm').classList.toggle('hidden', !!currentUser);
+      document.getElementById('adminPanel').classList.toggle('hidden', !currentUser);
+      document.getElementById('adminSubtitle').textContent = currentUser 
+        ? `Logged in as ${currentUser.email}` 
+        : 'Sign in to manage';
     }
 
     // =============================================
-    // DATA PROCESSING
+    // REALTIME
     // =============================================
-    function processData() {
-      const map = new Map();
-      
-      players.forEach(p => {
-        if (!CATEGORIES.includes(p.cat)) return;
-        
-        if (!map.has(p.name)) {
-          map.set(p.name, { 
-            name: p.name, 
-            region: p.region || '—', 
-            tester: !!p.tester, 
-            tiers: {}, 
-            points: 0 
-          });
-        }
-        
-        const entry = map.get(p.name);
-        const curTier = entry.tiers[p.cat];
-        
-        if (!curTier || getPoints(p.tier) > getPoints(curTier)) {
-          entry.tiers[p.cat] = p.tier;
-        }
-        
-        // Keep tester flag if any entry has it
-        if (p.tester) entry.tester = true;
-      });
-      
-      for (let p of map.values()) {
-        let pts = 0;
-        Object.values(p.tiers).forEach(t => pts += getPoints(t));
-        p.points = pts;
-        p.title = getTitle(pts);
-      }
-      
-      return { 
-        list: Array.from(map.values()).sort((a, b) => b.points - a.points || a.name.localeCompare(b.name)), 
-        map 
-      };
+    function setupRealtime() {
+      supabase.channel('players-realtime')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'players' }, () => {
+          console.log('🔄 Realtime update received');
+          refreshData();
+        })
+        .subscribe();
     }
 
     // =============================================
-    // RENDERING
+    // INIT
     // =============================================
-    const overallView = document.getElementById("overallView");
-    const tierView = document.getElementById("tierView");
-    const searchInput = document.getElementById("searchInput");
-    const pageTitle = document.getElementById("pageTitle");
-    
-    let currentFilter = "overall";
-    let processedData = { list: [], map: new Map() };
-
-    function showLoading() {
-      overallView.innerHTML = `
-        <div class="loading-container">
-          <div class="spinner"></div>
-          <div>Loading rankings...</div>
-        </div>
-      `;
-    }
-
-    function showError(message) {
-      overallView.innerHTML = `
-        <div class="error-container">
-          <div class="error-icon">⚠️</div>
-          <div class="error-title">Failed to load rankings</div>
-          <div class="error-msg">${message}</div>
-          <button class="btn-retry" onclick="initApp()">Retry</button>
-        </div>
-      `;
-    }
-
-    function render() {
-      const term = searchInput.value.toLowerCase();
-      pageTitle.textContent = currentFilter.charAt(0).toUpperCase() + currentFilter.slice(1);
-
-      if (currentFilter === "overall") {
-        tierView.classList.add("hidden");
-        overallView.classList.remove("hidden");
-        renderOverall(term);
-      } else {
-        overallView.classList.add("hidden");
-        tierView.classList.remove("hidden");
-        renderTier(term);
-      }
-    }
-
-    function renderOverall(term) {
-      overallView.innerHTML = "";
-      const filtered = processedData.list.filter(p => p.name.toLowerCase().includes(term));
+    async function initApp() {
+      console.log('🚀 Starting app...');
+      showLoading();
       
-      if (!filtered.length) {
-        overallView.innerHTML = `<div style="text-align:center;padding:40px;color:#555;">No players found.</div>`;
+      const success = await loadPlayers();
+      if (!success) {
+        showError('Could not connect to database. Check console for details.');
         return;
       }
-
-      filtered.forEach((p, idx) => {
-        const el = document.createElement("div");
-        el.className = "player-card-row";
-        
-        const breakdownHtml = CATEGORIES.map(c => {
-          const t = p.tiers[c] || "";
-          return `<div class="mini-pill" data-tier="${t}" title="${c}">${t}</div>`;
-        }).join('');
-
-        el.innerHTML = `
-          <div class="rank-num ${idx < 3 ? 'top-3' : ''}">#${idx + 1}</div>
-          <div class="player-info">
-            <img src="${getImageUrl(p.name, 'bust')}" class="player-head" loading="lazy" onerror="this.src='https://vzge.me/bust/X-Steve'">
-            <div class="player-details">
-              <div class="player-name">${p.name}</div>
-              <div class="player-meta">
-                ${p.tester ? '<span class="role-badge tester">TESTER</span>' : ''}
-                <span class="role-badge">${p.region}</span>
-                <span>${p.title}</span>
-              </div>
-            </div>
-          </div>
-          <div class="player-stats">
-             <div class="tier-pills">${breakdownHtml}</div>
-             <div class="stat-box">
-               <div class="stat-label">Points</div>
-               <div class="stat-value">${p.points}</div>
-             </div>
-          </div>
-        `;
-        el.onclick = () => openModal(p, idx + 1);
-        overallView.appendChild(el);
-      });
-    }
-
-    function renderTier(term) {
-      tierView.innerHTML = "";
-      const cols = [1, 2, 3, 4, 5];
-      const tierMap = { 1: [], 2: [], 3: [], 4: [], 5: [] };
       
-      const rawFiltered = players.filter(p => 
-        p.cat === currentFilter && p.name.toLowerCase().includes(term)
-      );
+      processedData = processData();
+      render();
+      setupRealtime();
+      await checkAuth();
       
-      rawFiltered.forEach(p => {
-        const m = p.tier.match(/(\d)$/);
-        if (m) {
-          const t = parseInt(m[1]);
-          if (tierMap[t]) tierMap[t].push(p);
-        }
-      });
-
-      Object.keys(tierMap).forEach(k => {
-        tierMap[k].sort((a, b) => {
-          const aH = a.tier.startsWith("HT");
-          const bH = b.tier.startsWith("HT");
-          if (aH && !bH) return -1;
-          if (!aH && bH) return 1;
-          return a.name.localeCompare(b.name);
-        });
-      });
-
-      cols.forEach(num => {
-        const col = document.createElement("div");
-        col.className = "tier-col";
-        const items = tierMap[num];
-        
-        let html = `<div class="tier-header">TIER ${num}</div><div class="tier-list">`;
-        
-        if (items.length === 0) {
-          html += `<div style="padding:20px;text-align:center;font-size:0.8rem;color:#444;">—</div>`;
-        } else {
-          items.forEach(p => {
-            html += `
-              <div class="tier-player" onclick="findAndOpen('${p.name}')">
-                <img src="${getImageUrl(p.name, 'face')}" class="tp-head" loading="lazy" onerror="this.src='https://vzge.me/face/X-Steve'">
-                <div class="tp-name">${p.name}</div>
-                <div class="tp-badge" data-tier="${p.tier}">${p.tier}</div>
-              </div>
-            `;
-          });
-        }
-        
-        html += `</div>`;
-        col.innerHTML = html;
-        tierView.appendChild(col);
-      });
+      console.log('✅ App ready!');
     }
 
     // =============================================
-    // MODALS
+    // EVENT LISTENERS
     // =============================================
-    const modalBackdrop = document.getElementById("modalBackdrop");
-    const mClose = document.getElementById("mClose");
     
-    function openModal(data, rank) {
-      const mHead = document.getElementById("mHead");
-      mHead.src = getImageUrl(data.name, 'bust');
-      mHead.onerror = function() { this.src = 'https://vzge.me/bust/X-Steve'; };
-
-      document.getElementById("mName").textContent = data.name;
-      document.getElementById("mTesterRow").classList.toggle("hidden", !data.tester);
-      document.getElementById("mTitle").textContent = data.title;
-      
-      const rankEl = document.getElementById("mRank");
-      rankEl.textContent = rank ? `#${rank}` : '-';
-      rankEl.classList.toggle("glow", rank && rank <= 3);
-
-      document.getElementById("mPoints").textContent = data.points;
-      document.getElementById("mRegion").textContent = data.region || '-';
-      
-      const bd = document.getElementById("mBreakdown");
-      bd.innerHTML = "";
-      
-      CATEGORIES.forEach(c => {
-        const t = data.tiers[c] || "";
-        const div = document.createElement("div");
-        div.className = "bd-item";
-        div.innerHTML = `
-          <div class="bd-icon" title="${c}"><img src="${CAT_ICONS[c]}" alt="" onerror="this.style.display='none'"></div>
-          <div class="bd-badge" data-tier="${t}">${t || '-'}</div>
-        `;
-        bd.appendChild(div);
-      });
-      
-      modalBackdrop.classList.add("show");
-    }
-
-    function closeModal() { modalBackdrop.classList.remove("show"); }
-    mClose.onclick = closeModal;
-    modalBackdrop.onclick = (e) => { if (e.target === modalBackdrop) closeModal(); };
-
-    function findAndOpen(name) {
-      const p = processedData.map.get(name);
-      if (p) {
-        const idx = processedData.list.indexOf(p);
-        openModal(p, idx + 1);
-      }
-    }
-
-    // Info Modal
-    const infoBtn = document.getElementById("infoBtn");
-    const infoBackdrop = document.getElementById("infoBackdrop");
-    const infoClose = document.getElementById("infoClose");
+    // Modal close buttons
+    document.getElementById("mClose").onclick = () => closeModal("modalBackdrop");
+    document.getElementById("modalBackdrop").onclick = (e) => { 
+      if (e.target.id === "modalBackdrop") closeModal("modalBackdrop"); 
+    };
     
-    infoBtn.onclick = () => infoBackdrop.classList.add("show");
-    infoClose.onclick = () => infoBackdrop.classList.remove("show");
-    infoBackdrop.onclick = (e) => { if (e.target === infoBackdrop) infoBackdrop.classList.remove("show"); };
-
-    // Admin Modal
-    const adminBtn = document.getElementById("adminBtn");
-    const adminBackdrop = document.getElementById("adminBackdrop");
-    const adminClose = document.getElementById("adminClose");
+    // Info modal
+    document.getElementById("infoBtn").onclick = () => document.getElementById("infoBackdrop").classList.add("show");
+    document.getElementById("infoClose").onclick = () => closeModal("infoBackdrop");
+    document.getElementById("infoBackdrop").onclick = (e) => { 
+      if (e.target.id === "infoBackdrop") closeModal("infoBackdrop"); 
+    };
     
-    adminBtn.onclick = () => adminBackdrop.classList.add("show");
-    adminClose.onclick = () => adminBackdrop.classList.remove("show");
-    adminBackdrop.onclick = (e) => { if (e.target === adminBackdrop) adminBackdrop.classList.remove("show"); };
+    // Admin modal
+    document.getElementById("adminBtn").onclick = () => document.getElementById("adminBackdrop").classList.add("show");
+    document.getElementById("adminClose").onclick = () => closeModal("adminBackdrop");
+    document.getElementById("adminBackdrop").onclick = (e) => { 
+      if (e.target.id === "adminBackdrop") closeModal("adminBackdrop"); 
+    };
 
-    // Admin Tabs
+    // Admin tabs
     document.querySelectorAll('.admin-tab').forEach(tab => {
       tab.onclick = () => {
         document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
         tab.classList.add('active');
-        
-        const tabId = tab.dataset.tab;
-        document.getElementById('addForm').classList.toggle('hidden', tabId !== 'add');
-        document.getElementById('editForm').classList.toggle('hidden', tabId !== 'edit');
+        document.getElementById('addForm').classList.toggle('hidden', tab.dataset.tab !== 'add');
+        document.getElementById('editForm').classList.toggle('hidden', tab.dataset.tab !== 'edit');
       };
     });
 
-    // Auth
-    document.getElementById('loginBtn').onclick = async () => {
+    // Login
+    document.getElementById('loginBtn').onclick = () => {
       const email = document.getElementById('authEmail').value;
       const password = document.getElementById('authPassword').value;
-      
-      if (!email || !password) {
-        showToast('Please enter email and password', 'error');
-        return;
-      }
-      
-      await signIn(email, password);
+      if (email && password) signIn(email, password);
+      else showToast('Enter email and password', 'error');
     };
-
+    
+    // Logout
     document.getElementById('logoutBtn').onclick = signOut;
 
-    // Add Player Form
+    // Add player
     document.getElementById('submitAdd').onclick = async () => {
       const name = document.getElementById('addName').value.trim();
-      const category = document.getElementById('addCategory').value;
-      const tier = document.getElementById('addTier').value;
-      const region = document.getElementById('addRegion').value;
-      const tester = document.getElementById('addTester').checked;
-      
-      if (!name) {
-        showToast('Please enter a player name', 'error');
-        return;
-      }
+      if (!name) { showToast('Enter player name', 'error'); return; }
       
       const btn = document.getElementById('submitAdd');
       btn.disabled = true;
       btn.textContent = 'Adding...';
       
-      await addPlayer({ name, category, tier, region, tester });
+      await addPlayer({
+        name,
+        category: document.getElementById('addCategory').value,
+        tier: document.getElementById('addTier').value,
+        region: document.getElementById('addRegion').value,
+        tester: document.getElementById('addTester').checked
+      });
       
       btn.disabled = false;
       btn.textContent = 'Add Player Entry';
       document.getElementById('addName').value = '';
     };
 
-    // Edit Search
-    const editSearch = document.getElementById('editSearch');
-    const editResults = document.getElementById('editResults');
-    
-    editSearch.oninput = debounce(() => {
-      const term = editSearch.value.toLowerCase();
+    // Edit search
+    document.getElementById('editSearch').oninput = debounce(() => {
+      const term = document.getElementById('editSearch').value.toLowerCase();
+      const results = document.getElementById('editResults');
       
-      if (!term) {
-        editResults.innerHTML = '<div style="text-align:center;color:#555;padding:20px;">Search for a player...</div>';
-        return;
+      if (!term) { 
+        results.innerHTML = '<div style="text-align:center;color:#555;padding:20px;">Search for a player...</div>'; 
+        return; 
       }
       
       const matches = players.filter(p => p.name.toLowerCase().includes(term));
-      
-      if (!matches.length) {
-        editResults.innerHTML = '<div style="text-align:center;color:#555;padding:20px;">No results</div>';
-        return;
-      }
-      
-      editResults.innerHTML = matches.slice(0, 20).map(p => `
+      results.innerHTML = matches.length ? matches.slice(0, 20).map(p => `
         <div style="display:flex;align-items:center;gap:12px;padding:10px;background:#141414;border-radius:8px;margin-bottom:6px;border:1px solid #222;">
           <img src="${getImageUrl(p.name, 'face')}" style="width:28px;height:28px;border-radius:4px;" onerror="this.style.display='none'">
           <div style="flex:1;">
@@ -1254,67 +996,32 @@
           </div>
           <button onclick="deletePlayer('${p.id}', '${p.name}')" style="padding:6px 10px;border-radius:6px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.1);color:#ef4444;font-size:0.75rem;font-weight:600;cursor:pointer;">Delete</button>
         </div>
-      `).join('');
+      `).join('') : '<div style="text-align:center;color:#555;padding:20px;">No results</div>';
     }, 300);
 
-    // Navigation
+    // Navigation tabs
     document.querySelectorAll(".nav-btn").forEach(btn => {
       btn.onclick = () => {
         document.querySelectorAll(".nav-btn").forEach(b => b.setAttribute("aria-pressed", "false"));
         btn.setAttribute("aria-pressed", "true");
         currentFilter = btn.dataset.filter;
         render();
-        
-        if (window.innerWidth < 768) {
-          btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-        }
       };
     });
-    
-    const debouncedRender = debounce(render, 200);
-    searchInput.oninput = debouncedRender;
 
-    // Keyboard shortcuts
+    // Search input
+    document.getElementById("searchInput").oninput = debounce(render, 200);
+
+    // Escape key to close modals
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
-        if (modalBackdrop.classList.contains('show')) closeModal();
-        if (infoBackdrop.classList.contains('show')) infoBackdrop.classList.remove('show');
-        if (adminBackdrop.classList.contains('show')) adminBackdrop.classList.remove('show');
+        closeModal("modalBackdrop");
+        closeModal("infoBackdrop");
+        closeModal("adminBackdrop");
       }
     });
 
-    // =============================================
-    // INITIALIZATION
-    // =============================================
-    async function initApp() {
-      showLoading();
-      
-      // Check authentication
-      await checkAuth();
-      
-      // Setup auth state listener
-      supabase.auth.onAuthStateChange((event, session) => {
-        currentUser = session?.user || null;
-        updateAdminUI();
-      });
-      
-      // Load data
-      const success = await loadPlayers();
-      
-      if (!success) {
-        showError('Could not connect to database. Please check your Supabase configuration.');
-        return;
-      }
-      
-      // Process and render
-      processedData = processData();
-      render();
-      
-      // Setup realtime
-      setupRealtimeSubscription();
-    }
-
-    // Start the app
+    // START THE APP
     initApp();
   </script>
 
