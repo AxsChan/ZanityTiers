@@ -357,6 +357,7 @@
       border: 2px solid #222;
       object-fit: contain;
       transition: all 0.3s;
+      image-rendering: pixelated;
     }
     .player-card:hover .player-bust {
       border-color: #333; transform: scale(1.05);
@@ -411,6 +412,7 @@
     }
     .pill-icon {
       width: 18px; height: 18px; opacity: 0.3;
+      image-rendering: pixelated;
     }
     .tier-pill[data-tier]:not([data-tier=""]) {
       background: rgba(255,255,255,0.05);
@@ -497,6 +499,7 @@
       width: 32px; height: 32px;
       border-radius: 8px; border: 2px solid #222;
       background: #111;
+      image-rendering: pixelated;
     }
     .tier-player-name {
       flex: 1; font-size: 0.85rem;
@@ -551,6 +554,7 @@
       cursor: pointer; display: grid;
       place-items: center; font-size: 1.3rem;
       transition: all 0.2s;
+      z-index: 10;
     }
     .modal-close:hover { background: rgba(255,255,255,0.1); color: #fff; }
 
@@ -563,6 +567,8 @@
       background: linear-gradient(135deg, #1a1a1a, #0f0f0f);
       box-shadow: 0 10px 30px rgba(0,0,0,0.5);
       object-fit: contain;
+      pointer-events: none;
+      image-rendering: pixelated;
     }
 
     .modal-badges {
@@ -648,7 +654,10 @@
       display: grid; place-items: center;
       border: 1px solid var(--border-main);
     }
-    .breakdown-icon img { width: 26px; height: 26px; opacity: 0.8; }
+    .breakdown-icon img { 
+      width: 26px; height: 26px; opacity: 0.8;
+      image-rendering: pixelated;
+    }
     .breakdown-tier {
       font-size: 0.7rem; font-weight: 700;
       padding: 4px 10px; border-radius: 6px;
@@ -683,7 +692,10 @@
       transition: all 0.2s;
     }
     .info-row:hover { border-color: var(--border-hover); background: rgba(255,255,255,0.03); }
-    .info-row-icon { width: 32px; height: 32px; object-fit: contain; }
+    .info-row-icon { 
+      width: 32px; height: 32px; object-fit: contain;
+      image-rendering: pixelated;
+    }
     .info-row-content { flex: 1; }
     .info-row-title { font-weight: 600; font-size: 0.95rem; }
     .info-row-desc { font-size: 0.75rem; color: #555; margin-top: 3px; }
@@ -766,7 +778,6 @@
   </div>
 
   <div class="app-layout">
-    <!-- Sidebar -->
     <aside class="sidebar">
       <div class="sidebar-header">
         <div class="brand">INVIS X</div>
@@ -818,7 +829,6 @@
       </div>
     </aside>
 
-    <!-- Main -->
     <main class="main-content">
       <header class="topbar">
         <div class="topbar-left">
@@ -849,7 +859,6 @@
     </main>
   </div>
 
-  <!-- Player Modal -->
   <div id="playerModal" class="modal-backdrop">
     <div class="modal">
       <button class="modal-close" onclick="closeModal('playerModal')">×</button>
@@ -882,7 +891,6 @@
     </div>
   </div>
 
-  <!-- Info Modal -->
   <div id="infoModal" class="modal-backdrop">
     <div class="modal">
       <button class="modal-close" onclick="closeModal('infoModal')">×</button>
@@ -926,19 +934,92 @@
     const $ = id => document.getElementById(id);
     const $$ = sel => document.querySelectorAll(sel);
 
+    // UUID Cache for cracked players
+    const uuidCache = new Map();
+
+    // Generate proper UUID v4 from player name
+    function generateUUID(name) {
+      if (uuidCache.has(name)) {
+        return uuidCache.get(name);
+      }
+      
+      let hash = 0;
+      for (let i = 0; i < name.length; i++) {
+        hash = ((hash << 5) - hash) + name.charCodeAt(i);
+        hash = hash & hash;
+      }
+      
+      const seed = Math.abs(hash);
+      const seededRandom = (index) => {
+        const x = Math.sin(seed + index) * 10000;
+        return x - Math.floor(x);
+      };
+      
+      const uuid = [
+        Math.floor(seededRandom(0) * 0xffffffff).toString(16).padStart(8, '0'),
+        Math.floor(seededRandom(1) * 0xffff).toString(16).padStart(4, '0'),
+        ((Math.floor(seededRandom(2) * 0xffff) & 0x0fff) | 0x4000).toString(16).padStart(4, '0'),
+        ((Math.floor(seededRandom(3) * 0xffff) & 0x3fff) | 0x8000).toString(16).padStart(4, '0'),
+        Math.floor(seededRandom(4) * 0xffffffffffff).toString(16).padStart(12, '0')
+      ].join('-');
+      
+      uuidCache.set(name, uuid);
+      console.log(`[UUID Generated] ${name} → ${uuid}`);
+      return uuid;
+    }
+
+    // ✅ FIXED: Use 3D rendering services
     function getBustUrl(name) {
-      return `https://vzge.me/bust/${encodeURIComponent((name || 'Steve').trim())}`;
+      const cleanName = (name || 'Steve').trim();
+      return `https://visage.surgeplay.com/bust/512/${encodeURIComponent(cleanName)}`;
     }
+
     function getAvatarUrl(name) {
-      return `https://vzge.me/face/${encodeURIComponent((name || 'Steve').trim())}`;
+      const cleanName = (name || 'Steve').trim();
+      return `https://visage.surgeplay.com/face/128/${encodeURIComponent(cleanName)}`;
     }
+
     function handleImgError(img, type = 'bust') {
-      const fb = type === 'bust'
-        ? ['https://vzge.me/bust/Steve', 'https://mc-heads.net/body/Steve/60']
-        : ['https://vzge.me/face/Steve', 'https://mc-heads.net/avatar/Steve/32'];
-      const idx = parseInt(img.dataset.fallback || '0');
-      if (idx < fb.length) { img.dataset.fallback = idx + 1; img.src = fb[idx]; }
+      const playerName = img.dataset.playerName || 'Steve';
+      const cleanName = (playerName || 'Steve').trim();
+      const randomUUID = generateUUID(cleanName);
+      
+      console.log(`[Image Error] ${playerName} (${type}) - Generated UUID: ${randomUUID}`);
+      
+      // Better 3D fallback chain
+      const busts = [
+        `https://visage.surgeplay.com/bust/512/${encodeURIComponent(cleanName)}`,
+        `https://visage.surgeplay.com/bust/512/${randomUUID}`,
+        `https://crafatar.com/renders/body/${randomUUID}?scale=10&overlay=true`,
+        `https://minotar.net/body/${randomUUID}/150.png`,
+        `https://mc-heads.net/body/${encodeURIComponent(cleanName)}/60`
+      ];
+      
+      const avatars = [
+        `https://visage.surgeplay.com/face/128/${encodeURIComponent(cleanName)}`,
+        `https://visage.surgeplay.com/face/128/${randomUUID}`,
+        `https://crafatar.com/avatars/${randomUUID}?size=128&overlay=true`,
+        `https://minotar.net/avatar/${randomUUID}/100.png`,
+        `https://mc-heads.net/avatar/${encodeURIComponent(cleanName)}/64`
+      ];
+      
+      const urls = type === 'bust' ? busts : avatars;
+      const currentIdx = parseInt(img.dataset.fallback || '0');
+      
+      console.log(`[Fallback Chain] ${playerName}: Attempt ${currentIdx + 1}/${urls.length}`);
+      
+      if (currentIdx < urls.length - 1) {
+        img.dataset.fallback = currentIdx + 1;
+        img.src = urls[currentIdx + 1];
+        console.log(`  → Trying: ${urls[currentIdx + 1]}`);
+      } else {
+        console.log(`[Skin Failed] ${playerName}: All ${urls.length} fallbacks exhausted`);
+        img.src = type === 'bust' 
+          ? 'https://visage.surgeplay.com/bust/512/8667ba71-b112-a42f-a9b4-8fe323f510e5' 
+          : 'https://visage.surgeplay.com/face/128/8667ba71-b112-a42f-a9b4-8fe323f510e5';
+      }
     }
+
     window.handleImgError = handleImgError;
 
     const getPoints = tier => POINTS[tier] || 0;
@@ -1035,6 +1116,7 @@
             ${tier ? `<span class="pill-tier">${tier}</span>` : ''}
           </div>`;
         }).join('');
+        
         return `
           <div class="player-card" data-name="${p.name}" data-rank="${rank}">
             <div class="rank-col">
@@ -1043,7 +1125,15 @@
             </div>
             <div class="player-info">
               <div class="player-avatar">
-                <img src="${getBustUrl(p.name)}" class="player-bust" alt="${p.name}" onerror="handleImgError(this,'bust')">
+                <img 
+                  src="${getBustUrl(p.name)}" 
+                  class="player-bust" 
+                  alt="${p.name}"
+                  data-player-name="${p.name}"
+                  data-fallback="0"
+                  onerror="handleImgError(this, 'bust')"
+                  onload="console.log('[3D Bust Loaded] ${p.name}')"
+                >
               </div>
               <div class="player-details">
                 <div class="player-name">${p.name}</div>
@@ -1066,12 +1156,13 @@
             </div>
           </div>`;
       }).join('');
+      
       view.querySelectorAll('.player-card').forEach(card => {
-  card.addEventListener('click', (event) => {
-    event.stopPropagation();
-    openPlayerModal(card.dataset.name, parseInt(card.dataset.rank));
-  });
-});
+        card.addEventListener('click', (event) => {
+          event.stopPropagation();
+          openPlayerModal(card.dataset.name, parseInt(card.dataset.rank));
+        });
+      });
     }
 
     function renderTierView(term) {
@@ -1095,7 +1186,15 @@
           <div class="tier-column-header">TIER ${n}<span class="tier-column-count">${tp.length}</span></div>
           <div class="tier-column-list">${tp.length ? tp.map(p => `
             <div class="tier-player" data-name="${p.name}">
-              <img src="${getAvatarUrl(p.name)}" class="tier-player-avatar" alt="" onerror="handleImgError(this,'avatar')">
+              <img 
+                src="${getAvatarUrl(p.name)}" 
+                class="tier-player-avatar" 
+                alt="${p.name}"
+                data-player-name="${p.name}"
+                data-fallback="0"
+                onerror="handleImgError(this, 'avatar')"
+                onload="console.log('[3D Avatar Loaded] ${p.name}')"
+              >
               <div class="tier-player-name">${p.name}</div>
               <div class="tier-player-badge" data-tier="${p.tier}">${p.tier}</div>
             </div>`).join('') : '<div class="tier-empty">No players</div>'}
@@ -1103,19 +1202,24 @@
         </div>`;
       }).join('');
       view.querySelectorAll('.tier-player').forEach(el => {
-  el.addEventListener('click', (event) => {
-    event.stopPropagation();
-    openPlayerModal(el.dataset.name);
-  });
-});
+        el.addEventListener('click', (event) => {
+          event.stopPropagation();
+          openPlayerModal(el.dataset.name);
+        });
+      });
     }
 
     function openPlayerModal(name, rank = null) {
       const p = processedData.map.get(name);
       if (!p) return;
       if (!rank) rank = processedData.list.findIndex(x => x.name === name) + 1;
-      $('modalBust').src = getBustUrl(p.name);
-      $('modalBust').onerror = function () { handleImgError(this, 'bust'); };
+      
+      const bustImg = $('modalBust');
+      bustImg.src = getBustUrl(p.name);
+      bustImg.dataset.playerName = p.name;
+      bustImg.dataset.fallback = '0';
+      bustImg.onerror = function () { handleImgError(this, 'bust'); };
+      
       $('modalBadges').innerHTML = `
         ${p.tester ? '<span class="badge badge-tester">Official Tester</span>' : ''}
         <span class="badge badge-region">${p.region}</span>`;
