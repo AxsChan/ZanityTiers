@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ZanityTiers | Admin Panel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    /* same CSS as before – kept for brevity, but ensure it's included */
+    :root {
+      --bg-dark: #050505;
+      --bg-card: #0a0a0a;
+      --bg-elevated: #111111;
+      --border-subtle: #1a1a1a;
+      --border-medium: #252525;
+      --accent: #ef4444;
+      --accent-hover: #dc2626;
+      --accent-glow: rgba(239,68,68,0.2);
+      --text-primary: #f0f0f0;
+      --text-secondary: #9ca3af;
+      --text-muted: #4b5563;
+      --t1: #ef4444;
+      --t2: #f97316;
+      --t3: #eab308;
+      --t4: #22c55e;
+      --t5: #3b82f6;
+      --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+      --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+      --radius-card: 1rem;
+      --radius-element: 0.75rem;
+      --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      --font-display: 'Poppins', sans-serif;
+      --font-body: 'Inter', sans-serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: var(--font-body);
+      background: var(--bg-dark);
+      color: var(--text-primary);
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+    /* Background effects */
+    .bg-glow {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: -1;
+    }
+    .bg-glow::before {
+      content: '';
+      position: absolute;
+      top: -20%;
+      left: -10%;
+      width: 80%;
+      height: 80%;
+      background: radial-gradient(circle, rgba(239,68,68,0.08) 0%, transparent 70%);
+      filter: blur(60px);
+      animation: float 20s infinite alternate;
+    }
+    .bg-glow::after {
+      content: '';
+      position: absolute;
+      bottom: -20%;
+      right: -10%;
+      width: 80%;
+      height: 80%;
+      background: radial-gradient(circle, rgba(239,68,68,0.05) 0%, transparent 70%);
+      filter: blur(60px);
+      animation: float 18s infinite alternate-reverse;
+    }
+    @keyframes float {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(5%, 5%) scale(1.1); }
+    }
+    .app { display: flex; min-height: 100vh; }
+    .sidebar {
+      width: 280px;
+      background: rgba(8, 8, 8, 0.8);
+      backdrop-filter: blur(20px);
+      border-right: 1px solid var(--border-subtle);
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      z-index: 10;
+    }
+    .sidebar-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .brand-icon {
+      width: 36px;
+      height: 36px;
+      object-fit: contain;
+      filter: drop-shadow(0 0 6px var(--accent-glow));
+    }
+    .brand-text {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #fff, var(--accent));
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .user-card {
+      margin: 1rem;
+      padding: 0.75rem;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-element);
+    }
+    .user-card-top {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.5rem;
+    }
+    .user-initials {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), #991b1b);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.85rem;
+    }
+    .user-name { font-weight: 700; font-size: 0.85rem; }
+    .user-handle { font-size: 0.65rem; color: var(--text-muted); margin-top: 2px; }
+    .role-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 0.2rem 0.6rem;
+      border-radius: 2rem;
+      font-size: 0.6rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .role-pill.admin { background: rgba(239,68,68,0.12); color: #ef4444; border: 1px solid rgba(239,68,68,0.2); }
+    .role-pill.tester { background: rgba(59,130,246,0.12); color: #3b82f6; border: 1px solid rgba(59,130,246,0.2); }
+    .role-pill.viewer { background: rgba(136,136,136,0.1); color: #888; border: 1px solid rgba(136,136,136,0.2); }
+    .nav {
+      flex: 1;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+    .nav-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      margin: 0.75rem 0.5rem 0.25rem;
+    }
+    .nav-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.6rem 1rem;
+      border-radius: var(--radius-element);
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      font-weight: 500;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: var(--transition);
+      text-align: left;
+      width: 100%;
+    }
+    .nav-btn:hover {
+      background: rgba(255,255,255,0.05);
+      color: var(--text-primary);
+      transform: translateX(4px);
+    }
+    .nav-btn[aria-pressed="true"] {
+      background: linear-gradient(135deg, rgba(239,68,68,0.12), rgba(239,68,68,0.05));
+      color: var(--accent);
+      border-left: 2px solid var(--accent);
+    }
+    .nav-icon {
+      width: 20px;
+      height: 20px;
+      object-fit: contain;
+      opacity: 0.7;
+    }
+    .sidebar-footer {
+      padding: 1rem;
+      border-top: 1px solid var(--border-subtle);
+      font-size: 0.65rem;
+      text-align: center;
+      color: var(--text-muted);
+    }
+    .sidebar-footer a {
+      color: var(--accent);
+      text-decoration: none;
+      margin: 0 0.25rem;
+    }
+    .main {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    .topbar {
+      position: sticky;
+      top: 0;
+      background: rgba(5, 5, 5, 0.8);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 0 1.5rem;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 9;
+    }
+    .page-title {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1rem;
+    }
+    .connection {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      background: rgba(255,255,255,0.02);
+      padding: 0.3rem 0.7rem;
+      border-radius: 2rem;
+    }
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #555;
+    }
+    .dot.live {
+      background: #22c55e;
+      box-shadow: 0 0 6px #22c55e;
+    }
+    .dot.syncing {
+      background: #eab308;
+      animation: pulse 1s infinite;
+    }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+    .content {
+      padding: 1.5rem;
+      flex: 1;
+    }
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-card);
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+    }
+    .card-title {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .card-desc {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+    }
+    .f-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .f-group {
+      margin-bottom: 1rem;
+    }
+    .f-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      display: block;
+      margin-bottom: 0.25rem;
+    }
+    .f-input, .f-select {
+      width: 100%;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border-subtle);
+      border-radius: 0.5rem;
+      padding: 0.6rem 0.8rem;
+      color: var(--text-primary);
+      font-size: 0.85rem;
+      outline: none;
+      transition: var(--transition);
+    }
+    .f-input:focus, .f-select:focus {
+      border-color: var(--accent);
+      background: rgba(255,255,255,0.05);
+    }
+    .btn {
+      padding: 0.6rem 1rem;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: var(--transition);
+      border: none;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+      color: white;
+    }
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px var(--accent-glow);
+    }
+    .btn-success {
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      color: white;
+    }
+    .btn-danger {
+      background: rgba(239,68,68,0.1);
+      color: #ef4444;
+      border: 1px solid rgba(239,68,68,0.2);
+    }
+    .btn-danger:hover {
+      background: rgba(239,68,68,0.2);
+    }
+    .btn-sm {
+      padding: 0.3rem 0.6rem;
+      font-size: 0.7rem;
+    }
+    .btn-full { width: 100%; }
+    .tier-editor {
+      background: rgba(0,0,0,0.2);
+      border-radius: 0.75rem;
+      padding: 1rem;
+      margin-top: 1rem;
+    }
+    .tier-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: 0.5rem;
+    }
+    .tier-item label {
+      font-size: 0.6rem;
+      color: var(--text-muted);
+      display: block;
+      margin-bottom: 0.2rem;
+      text-transform: uppercase;
+    }
+    .tier-item select {
+      width: 100%;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border-subtle);
+      border-radius: 0.5rem;
+      padding: 0.4rem;
+      color: white;
+      font-size: 0.75rem;
+    }
+    .player-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.5rem;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border-subtle);
+      border-radius: 0.75rem;
+      margin-bottom: 0.5rem;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .player-item:hover {
+      background: rgba(255,255,255,0.05);
+      border-color: var(--border-medium);
+    }
+    .player-item img {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      background: #111;
+    }
+    .player-item-info {
+      flex: 1;
+    }
+    .player-item-name {
+      font-weight: 600;
+      font-size: 0.85rem;
+    }
+    .player-item-meta {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+    }
+    .player-item-tags {
+      display: flex;
+      gap: 0.25rem;
+      flex-wrap: wrap;
+      margin-top: 0.2rem;
+    }
+    .tier-tag {
+      font-size: 0.55rem;
+      padding: 0.1rem 0.3rem;
+      border-radius: 4px;
+      background: rgba(255,255,255,0.05);
+    }
+    .table-wrap {
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      text-align: left;
+      padding: 0.75rem;
+      border-bottom: 1px solid var(--border-subtle);
+      font-size: 0.8rem;
+    }
+    th {
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+    .toast {
+      position: fixed;
+      bottom: 1rem;
+      right: 1rem;
+      padding: 0.75rem 1rem;
+      border-radius: 0.5rem;
+      font-size: 0.8rem;
+      font-weight: 500;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      transform: translateY(100%);
+      opacity: 0;
+      transition: all 0.3s;
+      pointer-events: none;
+      z-index: 1000;
+    }
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    .toast.success { border-left: 3px solid #22c55e; }
+    .toast.error { border-left: 3px solid #ef4444; }
+    .toast.info { border-left: 3px solid #3b82f6; }
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    .checkbox-group label {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      cursor: pointer;
+    }
+    .hidden { display: none !important; }
+    @media (max-width: 768px) {
+      .sidebar { width: 100%; height: auto; position: relative; border-right: none; border-bottom: 1px solid var(--border-subtle); }
+      .nav { flex-direction: row; overflow-x: auto; padding: 0.5rem; gap: 0.25rem; }
+      .nav-label { display: none; }
+      .nav-btn { padding: 0.4rem 0.8rem; white-space: nowrap; }
+      .nav-btn[aria-pressed="true"] { border-left: none; border-bottom: 2px solid var(--accent); }
+      .topbar { padding: 0 1rem; }
+      .content { padding: 1rem; }
+      .f-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div class="bg-glow"></div>
+
+<!-- Login screen -->
+<div id="loginScreen" class="app" style="min-height:100vh; justify-content: center; align-items: center;">
+  <div class="card" style="max-width: 400px; width: 100%; margin: 1rem;">
+    <div style="text-align:center; margin-bottom:1.5rem;">
+      <img src="icon/box.png" style="width: 60px; margin-bottom: 0.5rem;" onerror="this.style.display='none'">
+      <div class="brand-text" style="font-size:1.5rem;">ZanityTiers</div>
+      <div style="font-size:0.7rem; color:var(--text-muted)">Admin Panel</div>
+    </div>
+    <div id="loginErr" class="toast error" style="position:static; margin-bottom:1rem; transform:none; opacity:1; display:none;"></div>
+    <div class="f-group">
+      <label class="f-label">Username</label>
+      <input type="text" id="loginUser" class="f-input" placeholder="Enter username">
+    </div>
+    <div class="f-group">
+      <label class="f-label">Password</label>
+      <input type="password" id="loginPass" class="f-input" placeholder="Enter password">
+    </div>
+    <button id="loginBtn" class="btn btn-primary btn-full">Sign In</button>
+    <div style="margin-top:1rem; text-align:center; font-size:0.7rem;">
+      <a href="index.html" style="color:var(--accent);">← Back to Rankings</a>
+    </div>
+  </div>
+</div>
+
+<!-- Panel -->
+<div id="panel" class="app hidden">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <img src="icon/box.png" class="brand-icon" onerror="this.style.display='none'">
+      <div class="brand-text">ZanityTiers</div>
+    </div>
+    <div class="user-card">
+      <div class="user-card-top">
+        <div id="userInitials" class="user-initials">?</div>
+        <div>
+          <div id="userName" class="user-name"></div>
+          <div id="userHandle" class="user-handle"></div>
+        </div>
+      </div>
+      <div id="userRole" class="role-pill admin">Admin</div>
+    </div>
+    <nav class="nav">
+      <div class="nav-label">Management</div>
+      <button class="nav-btn" data-tab="players" aria-pressed="true">
+        <i class="fas fa-gamepad nav-icon"></i>
+        <span>Edit Players</span>
+      </button>
+      <button class="nav-btn" data-tab="accounts" id="accountsTabBtn" aria-pressed="false">
+        <i class="fas fa-users nav-icon"></i>
+        <span>Accounts</span>
+      </button>
+    </nav>
+    <div class="sidebar-footer">
+      <button onclick="signOut()" class="btn btn-danger btn-sm btn-full">Sign Out</button>
+      <div style="margin-top:0.5rem;"><a href="index.html" style="color:var(--text-muted); font-size:0.7rem;">📊 Rankings</a></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div class="page-title">
+        <i id="topbarIcon" class="fas fa-gamepad"></i>
+        <span id="topbarTitle">Edit Players</span>
+      </div>
+      <div class="connection">
+        <div class="dot" id="connDot"></div>
+        <span id="connText">Connecting</span>
+      </div>
+    </header>
+
+    <div class="content">
+      <!-- Players tab -->
+      <div id="tabPlayers">
+        <div id="canTestSection">
+          <div class="card">
+            <div class="card-title"><i class="fas fa-plus"></i> Add / Edit Player</div>
+            <div class="card-desc">Set all tiers for a player and mark them as an official tester if needed.</div>
+            <div class="f-row">
+              <div class="f-group">
+                <label class="f-label">Player Name (IGN)</label>
+                <input type="text" id="pName" class="f-input" placeholder="e.g. Technoblade">
+              </div>
+              <div class="f-group">
+                <label class="f-label">Region</label>
+                <select id="pRegion" class="f-select">
+                  <option value="NA">🇺🇸 NA</option>
+                  <option value="EU">🇪🇺 EU</option>
+                  <option value="ASIA">🌏 ASIA</option>
+                  <option value="OCE">🇦🇺 OCE</option>
+                  <option value="SA">🇧🇷 SA</option>
+                </select>
+              </div>
+            </div>
+            <div class="checkbox-group">
+              <input type="checkbox" id="pTester">
+              <label for="pTester">Official Tester (shows "Official Tester" badge on rankings)</label>
+            </div>
+            <div class="tier-editor">
+              <div class="card-title" style="margin-bottom:0.5rem;"><i class="fas fa-trophy"></i> Tier Assignments</div>
+              <div class="tier-grid">
+                <div class="tier-item"><label>⚔️ Sword</label><select id="tier_sword"><option value="">None</option><option>HT1</option><option>LT1</option><option>HT2</option><option>LT2</option><option>HT3</option><option>LT3</option><option>HT4</option><option>LT4</option><option>HT5</option><option>LT5</option></select></div>
+                <div class="tier-item"><label>🪓 Axe</label><select id="tier_axe"><option value="">None</option><option>HT1</option><option>LT1</option><option>HT2</option><option>LT2</option><option>HT3</option><option>LT3</option><option>HT4</option><option>LT4</option><option>HT5</option><option>LT5</option></select></div>
+                <div class="tier-item"><label>💎 Crystal</label><select id="tier_crystal"><option value="">None</option><option>HT1</option><option>LT1</option><option>HT2</option><option>LT2</option><option>HT3</option><option>LT3</option><option>HT4</option><option>LT4</option><option>HT5</option><option>LT5</option></select></div>
+                <div class="tier-item"><label>🧪 Nethpot</label><select id="tier_nethpot"><option value="">None</option><option>HT1</option><option>LT1</option><option>HT2</option><option>LT2</option><option>HT3</option><option>LT3</option><option>HT4</option><option>LT4</option><option>HT5</option><option>LT5</option></select></div>
+                <div class="tier-item"><label>❤️ UHC</label><select id="tier_uhc"><option value="">None</option><option>HT1</option><option>LT1</option><option>HT2</option><option>LT2</option><option>HT3</option><option>LT3</option><option>HT4</option><option>LT4</option><option>HT5</option><option>LT5</option></select></div>
+                <div class="tier-item"><label>🏠 SMP</label><select id="tier_smp"><option value="">None</option><option>HT1</option><option>LT1</option><option>HT2</option><option>LT2</option><option>HT3</option><option>LT3</option><option>HT4</option><option>LT4</option><option>HT5</option><option>LT5</option></select></div>
+                <div class="tier-item"><label>🔨 Mace</label><select id="tier_mace"><option value="">None</option><option>HT1</option><option>LT1</option><option>HT2</option><option>LT2</option><option>HT3</option><option>LT3</option><option>HT4</option><option>LT4</option><option>HT5</option><option>LT5</option></select></div>
+              </div>
+            </div>
+            <button id="savePlayerBtn" class="btn btn-success btn-full" style="margin-top:1rem;">Save All Tiers</button>
+          </div>
+        </div>
+
+        <div id="noTestSection" class="hidden">
+          <div class="card" style="text-align:center; padding:2rem;">
+            <i class="fas fa-lock" style="font-size:2rem; opacity:0.5; margin-bottom:0.5rem;"></i>
+            <div style="font-weight:700;">Testing Access Disabled</div>
+            <div style="font-size:0.75rem; color:var(--text-muted);">Your account does not have testing permissions.<br>Contact an admin to enable it.</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><i class="fas fa-search"></i> Search Players</div>
+          <div class="card-desc">Click a player to load for editing</div>
+          <input type="text" id="searchP" class="f-input" placeholder="Search by name...">
+          <div id="pResults" style="margin-top:1rem;"></div>
+        </div>
+      </div>
+
+      <!-- Accounts tab (admin only) -->
+      <div id="tabAccounts" class="hidden">
+        <div class="card">
+          <div class="card-title"><i class="fas fa-user-plus"></i> Create Account</div>
+          <div class="f-row">
+            <div class="f-group"><label class="f-label">Username</label><input type="text" id="newUser" class="f-input" placeholder="username"></div>
+            <div class="f-group"><label class="f-label">Password</label><input type="password" id="newPass" class="f-input" placeholder="min 6 chars"></div>
+          </div>
+          <div class="f-row">
+            <div class="f-group"><label class="f-label">Display Name</label><input type="text" id="newName" class="f-input" placeholder="In-game name"></div>
+            <div class="f-group"><label class="f-label">Role</label>
+              <select id="newRole" class="f-select"><option value="tester">🎮 Tester</option><option value="admin">👑 Admin</option></select>
+            </div>
+          </div>
+          <div class="f-group">
+            <label class="f-label">Can Test Players?</label>
+            <select id="newCanTest" class="f-select"><option value="true">✅ Yes</option><option value="false">❌ No</option></select>
+          </div>
+          <button id="createBtn" class="btn btn-success btn-full">Create Account</button>
+        </div>
+        <div class="card">
+          <div class="card-title"><i class="fas fa-list"></i> All Accounts</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Username</th><th>Display Name</th><th>Role</th><th>Can Test</th><th>Actions</th></tr></thead>
+              <tbody id="accList"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script type="module">
+  import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+  const SB_URL = 'https://sqvnsyvcxcsckfrruezq.supabase.co';
+  const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxdm5zeXZjeGNzY2tmcnJ1ZXpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5Njc1MTIsImV4cCI6MjA4OTU0MzUxMn0.8PZYAwk3A--v0re9rjdaR8buggFGM6EjEjTvCMBuJew';
+  const sb = createClient(SB_URL, SB_KEY);
+
+  let currentUser = null;
+  let players = [];
+  let testerAccounts = [];
+  let currentChannel = null;
+  const CATS = ['sword', 'axe', 'crystal', 'nethpot', 'uhc', 'smp', 'mace'];
+  const POINTS = { HT1: 60, LT1: 30, HT2: 30, LT2: 15, HT3: 15, LT3: 14, HT4: 8, LT4: 6, HT5: 4, LT5: 1 };
+
+  const $ = id => document.getElementById(id);
+  const $$ = sel => document.querySelectorAll(sel);
+
+  // Generate offline UUID with dashes (vzge.me expects dashed UUID)
+  function generateOfflineUUID(name) {
+    const str = name.toLowerCase().trim();
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      hash = ((hash << 5) - hash) + str.charCodeAt(i);
+      hash |= 0;
+    }
+    const hex = (hash >>> 0).toString(16).padStart(8, '0');
+    const uuid = `${hex.slice(0,8)}-${hex.slice(8,12)}-3${hex.slice(12,15)}-${hex.slice(15,18)}-${hex.slice(18,32)}`.padEnd(36, '0');
+    return uuid;
+  }
+
+  function getBustUrl(name) {
+    const uuid = generateOfflineUUID(name);
+    return `https://vzge.me/bust/${uuid}`;
+  }
+
+  function handleImgError(img) {
+    const name = img.dataset.playerName || 'Steve';
+    const uuid = generateOfflineUUID(name);
+    const fallbacks = [
+      `https://visage.surgeplay.com/bust/512/${uuid}`,
+      `https://crafatar.com/renders/body/${uuid}?scale=10&overlay=true`,
+      `https://minotar.net/body/${uuid}/150.png`
+    ];
+    let idx = parseInt(img.dataset.fallback || '0');
+    if (idx < fallbacks.length) {
+      img.dataset.fallback = idx + 1;
+      img.src = fallbacks[idx];
+    } else {
+      img.src = 'https://vzge.me/bust/8667ba71b112a42fa9b48fe323f510e5';
+    }
+  }
+  window.handleImgError = handleImgError;
+
+  function toast(msg, type = 'success') {
+    const el = $('toast');
+    el.textContent = msg;
+    el.className = `toast ${type} show`;
+    setTimeout(() => el.classList.remove('show'), 3000);
+  }
+
+  function showErr(msg) {
+    const err = $('loginErr');
+    err.textContent = msg;
+    err.style.display = msg ? 'block' : 'none';
+  }
+
+  function updateConnStatus(status) {
+    const dot = $('connDot');
+    const text = $('connText');
+    dot.className = 'dot';
+    if (status === 'connected') { dot.classList.add('live'); text.textContent = 'Live'; }
+    else if (status === 'syncing') { dot.classList.add('syncing'); text.textContent = 'Syncing'; }
+    else { text.textContent = 'Offline'; }
+  }
+
+  // Auth
+  $('loginBtn').onclick = async () => {
+    const u = $('loginUser').value.trim();
+    const p = $('loginPass').value;
+    if (!u || !p) { showErr('Enter username and password'); return; }
+    showErr('');
+    const btn = $('loginBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...';
+    try {
+      const { data, error } = await sb.from('testers').select('*').eq('username', u).eq('password', p).single();
+      if (error || !data) { showErr('Invalid credentials'); return; }
+      currentUser = data;
+      localStorage.setItem('zt_user', JSON.stringify(data));
+      initPanel();
+      toast(`Welcome, ${data.display_name}!`);
+    } catch (err) { showErr('Connection error'); }
+    finally { btn.disabled = false; btn.innerHTML = 'Sign In'; }
+  };
+
+  ['loginUser', 'loginPass'].forEach(id => {
+    $(id).addEventListener('keydown', e => { if (e.key === 'Enter') $('loginBtn').click(); });
+  });
+
+  window.signOut = () => {
+    if (currentChannel) sb.removeChannel(currentChannel);
+    currentUser = null;
+    localStorage.removeItem('zt_user');
+    $('panel').classList.add('hidden');
+    $('loginScreen').classList.remove('hidden');
+    $('loginUser').value = '';
+    $('loginPass').value = '';
+    toast('Signed out', 'info');
+  };
+
+  async function initPanel() {
+    const p = currentUser;
+    $('userInitials').textContent = (p.display_name || '?').charAt(0).toUpperCase();
+    $('userName').textContent = p.display_name || 'User';
+    $('userHandle').textContent = `@${p.username}`;
+    const roleEl = $('userRole');
+    if (p.is_admin) {
+      roleEl.className = 'role-pill admin';
+      roleEl.innerHTML = '👑 Admin';
+      $('accountsTabBtn').classList.remove('hidden');
+    } else {
+      roleEl.className = 'role-pill tester';
+      roleEl.innerHTML = '🎮 Tester';
+      $('accountsTabBtn').classList.add('hidden');
+      if ($('tabAccounts').classList.contains('hidden') === false) switchTab('players');
+    }
+
+    const canTest = p.is_admin || p.can_test !== false;
+    $('canTestSection').classList.toggle('hidden', !canTest);
+    $('noTestSection').classList.toggle('hidden', canTest);
+
+    $('loginScreen').classList.add('hidden');
+    $('panel').classList.remove('hidden');
+    updateConnStatus('syncing');
+    try {
+      await Promise.all([loadPlayers(), loadTesterAccounts()]);
+      updateConnStatus('connected');
+      if (p.is_admin) loadAccounts();
+      setupRealtime();
+    } catch (err) {
+      console.error(err);
+      updateConnStatus('error');
+      toast('Failed to load data', 'error');
+    }
+  }
+
+  const saved = localStorage.getItem('zt_user');
+  if (saved) { try { currentUser = JSON.parse(saved); initPanel(); } catch(e) {} }
+
+  async function loadPlayers() {
+    const { data, error } = await sb.from('players').select('*').order('name');
+    if (error) throw error;
+    players = data || [];
+  }
+  async function loadTesterAccounts() {
+    const { data, error } = await sb.from('testers').select('id,display_name,is_admin,can_test').order('display_name');
+    if (error) throw error;
+    testerAccounts = data || [];
+  }
+  async function loadAccounts() {
+    const { data, error } = await sb.from('testers').select('*').order('created_at', { ascending: false });
+    if (error) throw error;
+    renderAccounts(data || []);
+  }
+
+  window.loadPlayer = function(name) {
+    $('pName').value = name;
+    const entries = players.filter(p => p.name === name);
+    const playerData = entries[0];
+    $('pRegion').value = playerData?.region || 'NA';
+    $('pTester').checked = playerData?.tester === true;
+    CATS.forEach(c => { const s = $(`tier_${c}`); if (s) s.value = ''; });
+    entries.forEach(p => { const s = $(`tier_${p.category}`); if (s) s.value = p.tier; });
+    toast(`Loaded ${name}`);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  $('savePlayerBtn').onclick = async () => {
+    const name = $('pName').value.trim();
+    if (!name) { toast('Enter player name', 'error'); return; }
+    const region = $('pRegion').value;
+    const isTester = $('pTester').checked;
+    const btn = $('savePlayerBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+    let saved = 0, errors = 0;
+    
+    // First update the tester flag for this player (affects all rows)
+    try {
+      const { error: updateError } = await sb.from('players').update({ tester: isTester }).eq('name', name);
+      if (updateError) throw updateError;
+    } catch (err) { console.warn('Failed to update tester flag', err); }
+
+    for (const cat of CATS) {
+      const tier = $(`tier_${cat}`).value;
+      if (tier) {
+        try {
+          const { error } = await sb.from('players').upsert({ name, category: cat, tier, region, updated_at: new Date().toISOString() }, { onConflict: 'name,category' });
+          if (error) errors++; else saved++;
+        } catch { errors++; }
+      }
+    }
+    btn.disabled = false;
+    btn.innerHTML = 'Save All Tiers';
+    if (errors) toast(`Saved ${saved}, ${errors} failed`, 'error');
+    else if (saved) toast(`${name}: ${saved} tier${saved>1?'s':''} saved`);
+    else toast('No tiers selected', 'error');
+    await loadPlayers();
+    renderPlayerResults($('searchP').value.trim());
+  };
+
+  window.delAllPlayer = async (name) => {
+    if (!confirm(`Delete ALL tiers for ${name}?`)) return;
+    try {
+      await sb.from('players').delete().eq('name', name);
+      toast(`${name} deleted`);
+      await loadPlayers();
+      renderPlayerResults($('searchP').value.trim());
+    } catch (err) { toast(err.message, 'error'); }
+  };
+
+  function renderPlayerResults(term) {
+    const r = $('pResults');
+    if (!term) { r.innerHTML = '<div style="color:var(--text-muted); text-align:center; padding:1rem;">Type to search…</div>'; return; }
+    const nm = {};
+    players.filter(p => p.name.toLowerCase().includes(term.toLowerCase())).forEach(p => {
+      if (!nm[p.name]) nm[p.name] = { name: p.name, region: p.region, tester: p.tester, tiers: {} };
+      nm[p.name].tiers[p.category] = p.tier;
+    });
+    const res = Object.values(nm);
+    if (!res.length) { r.innerHTML = '<div style="text-align:center; padding:1rem;">No results</div>'; return; }
+    r.innerHTML = res.slice(0, 20).map(p => {
+      const tags = CATS.filter(c => p.tiers[c]).map(c => `<span class="tier-tag">${c}:${p.tiers[c]}</span>`).join('');
+      const testerBadge = p.tester ? '<span class="tester-tag" style="background:rgba(239,68,68,0.1); color:#ef4444; font-size:0.55rem; padding:0.1rem 0.4rem; border-radius:4px;">Official Tester</span>' : '';
+      return `<div class="player-item" onclick="window.loadPlayer('${escapeHtml(p.name)}')">
+        <img src="${getBustUrl(p.name)}" data-player-name="${p.name}" data-fallback="0" onerror="handleImgError(this)" style="width:40px;height:40px;">
+        <div class="player-item-info">
+          <div class="player-item-name">${escapeHtml(p.name)} ${testerBadge}</div>
+          <div class="player-item-meta">${p.region}</div>
+          <div class="player-item-tags">${tags}</div>
+        </div>
+        <button class="btn btn-danger btn-sm" onclick="event.stopPropagation();window.delAllPlayer('${escapeHtml(p.name)}')">Delete</button>
+      </div>`;
+    }).join('');
+  }
+
+  $('searchP').addEventListener('input', debounce(() => renderPlayerResults($('searchP').value.trim()), 250));
+
+  // Accounts
+  function renderAccounts(accs) {
+    const tbody = $('accList');
+    if (!tbody) return;
+    tbody.innerHTML = accs.map(a => `
+      <tr>
+        <td>@${escapeHtml(a.username)}</td>
+        <td>${escapeHtml(a.display_name)}</td>
+        <td><span class="role-pill ${a.is_admin ? 'admin' : 'tester'}" style="font-size:0.6rem;">${a.is_admin ? 'Admin' : 'Tester'}</span></td>
+        <td>${a.can_test !== false ? '✅ Yes' : '❌ No'}</td>
+        <td>${a.username === currentUser?.username ? '<span style="color:var(--text-muted)">You</span>' : `<button class="btn btn-danger btn-sm" onclick="delAcc('${a.id}','${escapeHtml(a.display_name)}')">Delete</button>`}</td>
+      </tr>
+    `).join('');
+  }
+  window.delAcc = async (id, name) => {
+    if (!confirm(`Delete ${name}?`)) return;
+    try {
+      await sb.from('testers').delete().eq('id', id);
+      toast(`${name} deleted`);
+      await loadTesterAccounts();
+      if (currentUser?.is_admin) loadAccounts();
+    } catch (err) { toast(err.message, 'error'); }
+  };
+  $('createBtn').onclick = async () => {
+    const u = $('newUser').value.trim();
+    const p = $('newPass').value;
+    const n = $('newName').value.trim();
+    const role = $('newRole').value;
+    const canTest = $('newCanTest').value === 'true';
+    if (!u || !p || !n) { toast('Fill all fields', 'error'); return; }
+    if (p.length < 6) { toast('Password min 6 chars', 'error'); return; }
+    const btn = $('createBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+    try {
+      const { error } = await sb.from('testers').insert({ username: u, password: p, display_name: n, is_admin: role === 'admin', can_test: canTest });
+      if (error) throw error;
+      toast(`${n} created!`);
+      $('newUser').value = ''; $('newPass').value = ''; $('newName').value = '';
+      await loadTesterAccounts();
+      if (currentUser?.is_admin) loadAccounts();
+    } catch (err) { toast(err.message.includes('duplicate') ? 'Username exists' : err.message, 'error'); }
+    finally { btn.disabled = false; btn.innerHTML = 'Create Account'; }
+  };
+
+  // Tabs
+  function switchTab(tab) {
+    $$('.nav-btn').forEach(b => b.setAttribute('aria-pressed', 'false'));
+    document.querySelector(`.nav-btn[data-tab="${tab}"]`).setAttribute('aria-pressed', 'true');
+    $('tabPlayers').classList.toggle('hidden', tab !== 'players');
+    $('tabAccounts').classList.toggle('hidden', tab !== 'accounts');
+    $('topbarTitle').textContent = tab === 'players' ? 'Edit Players' : 'Accounts';
+    $('topbarIcon').className = tab === 'players' ? 'fas fa-gamepad' : 'fas fa-users';
+  }
+  $$('.nav-btn[data-tab]').forEach(btn => {
+    btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+  });
+
+  // Realtime
+  function setupRealtime() {
+    if (currentChannel) sb.removeChannel(currentChannel);
+    currentChannel = sb.channel('admin-rt')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'players' }, async () => {
+        await loadPlayers();
+        renderPlayerResults($('searchP').value.trim());
+      })
+      .subscribe();
+  }
+
+  function debounce(fn, ms) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; }
+  function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
+</script>
+</body>
+</html>
